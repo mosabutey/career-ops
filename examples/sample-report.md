@@ -1,10 +1,11 @@
-# Evaluation: Acme AI -- Senior AI Engineer
+# Evaluation: Acme Health -- Scientific Strategy Manager
 
 **Date:** 2026-04-01
-**Archetype:** AI Platform / LLMOps Engineer
+**Track:** healthtech_scientific
+**Career Stage:** advanced_training
 **Score:** 4.2/5
-**URL:** https://jobs.example.com/acme-ai-senior-engineer
-**PDF:** output/cv-candidate-acme-ai-2026-04-01.pdf
+**URL:** https://jobs.example.com/acme-health-scientific-strategy
+**PDF:** output/cv-candidate-acme-health-2026-04-01.pdf
 
 ---
 
@@ -12,64 +13,46 @@
 
 | Field | Value |
 |-------|-------|
-| **Archetype** | AI Platform / LLMOps Engineer |
-| **Domain** | Platform / Infrastructure |
-| **Function** | Build |
-| **Seniority** | Senior (IC4-IC5) |
-| **Remote** | Full remote (US timezone overlap) |
-| **Team size** | ~8 engineers |
-| **TL;DR** | Senior AI eng to build and scale LLM infrastructure for enterprise customers |
+| **Track** | healthtech_scientific |
+| **Secondary Track** | biopharma_medical |
+| **Company Class** | Health-tech |
+| **Function** | Scientific strategy |
+| **Seniority** | Manager / senior individual contributor |
+| **Remote** | Hybrid |
+| **TL;DR** | Scientific strategy role for someone who can connect evidence, workflow, and product decisions |
 
-## B) CV Match
+## B) Experience Match
 
-| JD Requirement | CV Match | Source |
-|----------------|----------|--------|
-| "Production LLM systems" | Built real-time fraud detection + LLM eval toolkit | cv.md: TechFin Corp |
-| "Model monitoring and observability" | Drift detection, Grafana dashboards, retraining triggers | cv.md: ML Platform Lead |
-| "Python + distributed systems" | Python, Kafka, Kubernetes, Redis | cv.md: Skills |
-| "CI/CD for ML" | Reduced deploy from 2 weeks to 4 hours | cv.md: TechFin Corp |
+| JD Requirement | Candidate Match | Source |
+|----------------|-----------------|--------|
+| "Translate evidence into product or strategy decisions" | Synthesized complex findings into decision-ready presentations for mixed audiences | cv.md: Research Experience |
+| "Work with clinicians and cross-functional teams" | Coordinated across scientific and clinical stakeholders on study operations | cv.md: Clinical / Research Experience |
+| "Communicate clearly to non-specialists" | Teaching and presentation record demonstrates structured communication | cv.md: Teaching Experience |
 
-### Gaps
+## C) Positioning and Level Strategy
 
-| Gap | Severity | Mitigation |
-|-----|----------|------------|
-| "LLM-specific experience" | Medium | LLM Eval Toolkit is direct proof. Frame fraud detection as "production ML → production LLM" progression |
-| "Prompt engineering" | Low | Mention eval toolkit's prompt testing capabilities |
+The role fits an advanced-training candidate with strong scientific depth and unusually broad communication range. Position the transition as a move from generating evidence to helping teams act on it.
 
-## C) Level and Strategy
-
-**Detected level:** Senior (IC4)
-**Candidate's natural level:** Senior-Staff boundary
-
-**"Sell senior" plan:** Lead with platform ownership at TechFin ("led 3-person team, built MLOps for 4 teams"). Frame as ready for Staff scope.
-
-## D) Comp and Demand
+## D) Compensation and Market Context
 
 | Data Point | Value | Source |
 |------------|-------|--------|
-| Base salary range | $180-220K | Levels.fyi, similar AI infra roles |
-| Total comp (with equity) | $250-320K | Glassdoor estimates |
-| Demand trend | High -- LLM infra is top-5 most in-demand | LinkedIn job trends |
+| Base salary range | $145K-$190K | Glassdoor, public postings |
+| Demand trend | Rising for clinical and scientific strategy roles in health-tech | Public job market scan |
 
-## E) Personalization Plan
+## E) Positioning Plan
 
 | # | Section | Current | Proposed Change | Why |
 |---|---------|---------|-----------------|-----|
-| 1 | Summary | "Full-stack AI engineer" | "AI platform engineer focused on LLM infrastructure and observability" | Match JD language |
-| 2 | TechFin bullets | Generic ML platform | Add "LLM serving" context | JD specifically mentions LLMs |
-| 3 | Projects | Both listed equally | Lead with LLM Eval Toolkit | Direct LLM experience proof |
+| 1 | Summary | Research-focused | Lead with evidence-to-decision framing | Matches role language |
+| 2 | Experience order | Chronological only | Pull stakeholder-facing work higher | Signals cross-functional readiness |
 
-## F) Interview Plan
+## F) Interview and Narrative Plan
 
-| # | JD Requirement | STAR Story | S | T | A | R |
-|---|---------------|------------|---|---|---|---|
-| 1 | Production LLM systems | FraudShield scaling | 10K TPS requirement | Built streaming pipeline | Kafka + ensemble + feature store | 99.7% precision, $2M saved |
-| 2 | Team leadership | ML Platform team | 4 teams needed MLOps | Led 3-eng team, built platform | Registry + A/B + feature store | Deploy time 2 weeks → 4 hours |
+| # | JD Requirement | Story | S | T | A | R | Reflection |
+|---|----------------|-------|---|---|---|---|------------|
+| 1 | Evidence communication | Research presentation story | Complex study findings | Needed mixed-audience clarity | Reframed results for multiple audiences | Faster alignment and next-step decisions | Learned how to tailor scientific depth by stakeholder |
 
-**Recommended case study:** LLM Eval Toolkit -- shows LLM-specific expertise + open source impact
+## Extracted Keywords
 
----
-
-## Keywords Extracted
-
-LLM infrastructure, model serving, observability, ML platform, distributed systems, Python, Kubernetes, model monitoring, CI/CD, prompt engineering, evaluation, production ML, enterprise AI, scalability, reliability
+scientific strategy, clinical workflow, cross-functional communication, evidence synthesis, stakeholder alignment, health-tech, scientific operations

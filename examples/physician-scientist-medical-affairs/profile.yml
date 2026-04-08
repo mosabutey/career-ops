@@ -1,0 +1,29 @@
+candidate:
+  full_name: "Dr. Jordan Ellis"
+  background_type: "Physician-scientist"
+  training_stage: "experienced_professional"
+  work_authorization: "U.S. permanent work authorization"
+
+authorization:
+  country: "United States"
+  current_status: "Permanent resident"
+  can_work_now: true
+  requires_immediate_sponsorship: false
+  future_sponsorship_required: false
+  authorization_basis: "Permanent work authorization"
+  sponsorship_policy:
+    default_when_unstated: "apply"
+
+career_strategy:
+  primary_tracks:
+    - "biopharma_medical"
+  secondary_tracks:
+    - "healthtech_scientific"
+
+role_packs:
+  biopharma_medical:
+    enabled: true
+    target_roles:
+      - "Medical Science Liaison"
+      - "Associate Director, Medical Affairs"
+      - "Scientific Affairs Manager"

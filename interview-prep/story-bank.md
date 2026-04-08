@@ -1,10 +1,10 @@
 # Story Bank — Master STAR+R Stories
 
-This file accumulates your best interview stories over time. Each evaluation (Block F) adds new stories here. Instead of memorizing 100 answers, maintain 5-10 deep stories that you can bend to answer almost any behavioral question.
+This file accumulates your best interview stories over time. Each evaluation (Block G) adds new stories here. Instead of memorizing 100 answers, maintain 5-10 deep stories that you can bend to answer almost any behavioral question.
 
 ## How it works
 
-1. Every time `/career-ops oferta` generates Block F (Interview Plan), new STAR+R stories get appended here
+1. Every time `/career-ops evaluate` generates Block G (Interview Plan), new STAR+R stories get appended here
 2. Before your next interview, review this file — your stories are already organized by theme
 3. The "Big Three" questions can be answered with stories from this bank:
    - "Tell me about yourself" → combine 2-3 stories into a narrative

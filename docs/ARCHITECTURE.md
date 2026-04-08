@@ -1,110 +1,96 @@
 # Architecture
 
-## System Overview
+## System overview
 
-```
-                    ┌─────────────────────────────────┐
-                    │         Claude Code Agent        │
-                    │   (reads CLAUDE.md + modes/*.md) │
-                    └──────────┬──────────────────────┘
-                               │
-            ┌──────────────────┼──────────────────────┐
-            │                  │                       │
-     ┌──────▼──────┐   ┌──────▼──────┐   ┌───────────▼────────┐
-     │ Single Eval  │   │ Portal Scan │   │   Batch Process    │
-     │ (auto-pipe)  │   │  (scan.md)  │   │   (batch-runner)   │
-     └──────┬──────┘   └──────┬──────┘   └───────────┬────────┘
-            │                  │                       │
-            │           ┌──────▼──────┐          ┌────▼─────┐
-            │           │ pipeline.md │          │ N workers│
-            │           │ (URL inbox) │          │ (claude -p)
-            │           └─────────────┘          └────┬─────┘
-            │                                          │
-     ┌──────▼──────────────────────────────────────────▼──────┐
-     │                    Output Pipeline                      │
-     │  ┌──────────┐  ┌────────────┐  ┌───────────────────┐  │
-     │  │ Report.md│  │  PDF (HTML  │  │ Tracker TSV       │  │
-     │  │ (A-F eval)│  │  → Puppeteer)│  │ (merge-tracker)  │  │
-     │  └──────────┘  └────────────┘  └───────────────────┘  │
-     └────────────────────────────────────────────────────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │  data/applications.md │
-                    │  (canonical tracker)  │
-                    └──────────────────────┘
+Career-Ops LifeSci is a local-first career operating system built around one shared engine and multiple overlays.
+
+```text
+User materials
+  |-- cv.md
+  |-- article-digest.md
+  |-- config/profile.yml
+  |-- modes/_profile.md
+        |
+        v
+Shared engine
+  |-- modes/_shared.md
+  |-- evaluate / compare / scan / contact / pdf / batch
+        |
+        v
+Opportunity logic
+  |-- role pack detection
+  |-- career stage detection
+  |-- scoring + positioning
+        |
+        v
+Outputs
+  |-- reports/
+  |-- output/
+  |-- batch/tracker-additions/
+  |-- data/applications.md
 ```
 
-## Evaluation Flow (Single Offer)
+## Core idea
 
-1. **Input**: User pastes JD text or URL
-2. **Extract**: Playwright/WebFetch extracts JD from URL
-3. **Classify**: Detect archetype (1 of 6 types)
-4. **Evaluate**: 6 blocks (A-F):
-   - A: Role summary
-   - B: CV match (gaps + mitigation)
-   - C: Level strategy
-   - D: Comp research (WebSearch)
-   - E: CV personalization plan
-   - F: Interview prep (STAR stories)
-5. **Score**: Weighted average across 10 dimensions (1-5)
-6. **Report**: Save as `reports/{num}-{company}-{date}.md`
-7. **PDF**: Generate ATS-optimized CV (`generate-pdf.mjs`)
-8. **Track**: Write TSV to `batch/tracker-additions/`, auto-merged
+The system now reasons across a matrix:
 
-## Batch Processing
+`role_pack x career_stage`
 
-The batch system processes multiple offers in parallel:
+### Role packs
 
-```
-batch-input.tsv    →  batch-runner.sh  →  N × claude -p workers
-(id, url, source)     (orchestrator)       (self-contained prompt)
-                           │
-                    batch-state.tsv
-                    (tracks progress)
-```
+- `biopharma_medical`
+- `life_sciences_consulting`
+- `healthtech_scientific`
+- `adjacent_generalist`
 
-Each worker is a headless Claude instance (`claude -p`) that receives the full `batch-prompt.md` as context. Workers produce:
-- Report .md
-- PDF
-- Tracker TSV line
+### Career stages
 
-The orchestrator manages parallelism, state, retries, and resume.
+- `student_early`
+- `advanced_training`
+- `experienced_professional`
 
-## Data Flow
+This lets the same engine serve:
+- a graduate student applying for internships
+- a PhD or MD-PhD moving into industry
+- an experienced clinician or scientist making a strategic pivot
 
-```
-cv.md                    →  Evaluation context
-article-digest.md        →  Proof points for matching
-config/profile.yml       →  Candidate identity
-portals.yml              →  Scanner configuration
-templates/states.yml     →  Canonical status values
-templates/cv-template.html → PDF generation template
-```
+## Single-offer flow
 
-## File Naming Conventions
+1. User provides a JD or URL
+2. The system reads source materials
+3. It detects the primary role pack and the user's stage
+4. It evaluates fit using the shared rubric plus overlays
+5. It writes a report
+6. It generates a tailored resume variant
+7. It registers the opportunity through tracker TSV flow
 
-- Reports: `{###}-{company-slug}-{YYYY-MM-DD}.md` (3-digit zero-padded)
-- PDFs: `cv-candidate-{company-slug}-{YYYY-MM-DD}.pdf`
-- Tracker TSVs: `batch/tracker-additions/{id}.tsv`
+## Scanner flow
 
-## Pipeline Integrity
+1. Read `portals.yml`
+2. Scan configured company pages and broad search queries
+3. Extract candidate listings
+4. Tag roles by likely pack, class, and stage fit
+5. Filter and deduplicate
+6. Add strong candidates to `pipeline.md`
 
-Scripts maintain data consistency:
+## Document generation flow
 
-| Script | Purpose |
-|--------|---------|
-| `merge-tracker.mjs` | Merges batch TSV additions into applications.md |
-| `verify-pipeline.mjs` | Health check: statuses, duplicates, links |
-| `dedup-tracker.mjs` | Removes duplicate entries by company+role |
-| `normalize-statuses.mjs` | Maps status aliases to canonical values |
-| `cv-sync-check.mjs` | Validates setup consistency |
+The PDF system uses one fact source of truth but multiple output families:
+- medical affairs resume
+- consulting resume
+- health-tech resume
+- short industry CV
+- internship / externship / co-op variant
 
-## Dashboard TUI
+The chosen family changes section order, vocabulary, and emphasis without inventing facts.
 
-The `dashboard/` directory contains a standalone Go TUI application that visualizes the pipeline:
+## Data integrity
 
-- Filter tabs: All, Evaluada, Aplicado, Entrevista, Top >=4, No Aplicar
-- Sort modes: Score, Date, Company, Status
-- Grouped/flat view
-- Lazy-loaded report previews
-- Inline status picker
+The canonical tracker contract remains unchanged:
+- new rows flow through `batch/tracker-additions/`
+- `merge-tracker.mjs` merges them into `data/applications.md`
+- `verify-pipeline.mjs`, `normalize-statuses.mjs`, and `dedup-tracker.mjs` maintain consistency
+
+## Design principle
+
+The repo should stay broad enough to serve many user archetypes while remaining concrete enough to help a single candidate act today.

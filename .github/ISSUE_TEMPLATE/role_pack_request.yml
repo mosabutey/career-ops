@@ -1,0 +1,30 @@
+name: Role Pack Request
+description: Propose a new role pack or a major improvement to an existing one
+labels: ["enhancement", "role-pack"]
+body:
+  - type: input
+    id: role_pack_name
+    attributes:
+      label: Role pack name
+      placeholder: "e.g., venture diligence, medtech commercialization, policy fellowships"
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Who is this for?
+      description: Describe the users, career stage, and target roles.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What should the system understand better?
+      description: Mention scoring, scanner, resume, networking, or interview needs.
+    validations:
+      required: true
+  - type: textarea
+    id: example_roles
+    attributes:
+      label: Example role titles or companies
+      description: Share a few public examples if possible.

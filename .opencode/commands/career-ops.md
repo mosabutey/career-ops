@@ -1,8 +1,8 @@
 ---
-description: AI job search command center -- show menu or evaluate job description
+description: Career-Ops LifeSci -- show menu or evaluate an opportunity
 ---
 
-Career-ops router. Arguments provided: "$ARGUMENTS"
+Career-Ops LifeSci router. Arguments provided: "$ARGUMENTS"
 
 If arguments contain a job description or URL (keywords like "responsibilities", "requirements", "qualifications", "about the role", "http", "https"), the skill will execute auto-pipeline mode.
 

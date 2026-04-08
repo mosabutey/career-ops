@@ -9,9 +9,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/santifer/career-ops/dashboard/internal/data"
-	"github.com/santifer/career-ops/dashboard/internal/model"
-	"github.com/santifer/career-ops/dashboard/internal/theme"
+	"github.com/mosabutey/career-ops-lifesci/dashboard/internal/data"
+	"github.com/mosabutey/career-ops-lifesci/dashboard/internal/model"
+	"github.com/mosabutey/career-ops-lifesci/dashboard/internal/theme"
 )
 
 // PipelineClosedMsg is emitted when the pipeline screen is dismissed.
@@ -43,10 +43,11 @@ type PipelineUpdateStatusMsg struct {
 }
 
 type reportSummary struct {
-	archetype string
-	tldr      string
-	remote    string
-	comp      string
+	track       string
+	careerStage string
+	tldr        string
+	remote      string
+	comp        string
 }
 
 // Sort modes
@@ -150,12 +151,13 @@ func (m *PipelineModel) CopyReportCache(other *PipelineModel) {
 }
 
 // EnrichReport caches report summary data for preview.
-func (m *PipelineModel) EnrichReport(reportPath, archetype, tldr, remote, comp string) {
+func (m *PipelineModel) EnrichReport(reportPath, track, careerStage, tldr, remote, comp string) {
 	m.reportCache[reportPath] = reportSummary{
-		archetype: archetype,
-		tldr:      tldr,
-		remote:    remote,
-		comp:      comp,
+		track:       track,
+		careerStage: careerStage,
+		tldr:        tldr,
+		remote:      remote,
+		comp:        comp,
 	}
 }
 
@@ -713,9 +715,13 @@ func (m PipelineModel) renderPreview() string {
 
 	// Check report cache
 	if summary, ok := m.reportCache[app.ReportPath]; ok {
-		if summary.archetype != "" {
+		if summary.track != "" {
 			lines = append(lines, padStyle.Render(
-				labelStyle.Render("Arquetipo: ")+valueStyle.Render(summary.archetype)))
+				labelStyle.Render("Track: ")+valueStyle.Render(summary.track)))
+		}
+		if summary.careerStage != "" {
+			lines = append(lines, padStyle.Render(
+				labelStyle.Render("Career Stage: ")+valueStyle.Render(summary.careerStage)))
 		}
 		if summary.tldr != "" {
 			lines = append(lines, padStyle.Render(
@@ -760,7 +766,7 @@ func (m PipelineModel) renderHelp() string {
 				keyStyle.Render("Esc") + descStyle.Render(" cancel"))
 	}
 
-	brand := lipgloss.NewStyle().Foreground(m.theme.Overlay).Render("career-ops by santifer.io")
+	brand := lipgloss.NewStyle().Foreground(m.theme.Overlay).Render("Career-Ops LifeSci")
 
 	keys := keyStyle.Render("↑↓") + descStyle.Render(" nav  ") +
 		keyStyle.Render("←→") + descStyle.Render(" tabs  ") +

@@ -2,79 +2,74 @@
 
 ## Prerequisites
 
-- [Claude Code](https://claude.ai/code) installed and configured
-- Node.js 18+ (for PDF generation and utility scripts)
-- (Optional) Go 1.21+ (for the dashboard TUI)
+- an AI coding tool such as Claude Code, Codex, or OpenCode
+- Node.js 18+
+- Playwright Chromium for PDF generation
+- optional: Go for the dashboard
 
-## Quick Start (5 steps)
+## Quick Start
 
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/santifer/career-ops.git
-cd career-ops
+git clone https://github.com/mosabutey/career-ops-lifesci.git
+cd career-ops-lifesci
 npm install
-npx playwright install chromium   # Required for PDF generation
+npx playwright install chromium
 ```
 
 ### 2. Configure your profile
 
 ```bash
 cp config/profile.example.yml config/profile.yml
-```
-
-Edit `config/profile.yml` with your personal details: name, email, target roles, narrative, proof points.
-
-### 3. Add your CV
-
-Create `cv.md` in the project root with your full CV in markdown format. This is the source of truth for all evaluations and PDFs.
-
-(Optional) Create `article-digest.md` with proof points from your portfolio projects/articles.
-
-### 4. Configure portals
-
-```bash
 cp templates/portals.example.yml portals.yml
 ```
 
-Edit `portals.yml`:
-- Update `title_filter.positive` with keywords matching your target roles
-- Add companies you want to track in `tracked_companies`
-- Customize `search_queries` for your preferred job boards
+Edit `config/profile.yml` with:
+- your identity
+- your career stage
+- your primary role packs
+- your narrative and proof themes
+- your markets and constraints
 
-### 5. Start using
+### 3. Add your source materials
 
-Open Claude Code in this directory:
+Create `cv.md` in the project root.
+
+Optional but strongly recommended:
+- `article-digest.md` for proof points, publications, projects, awards, or case studies
+- `modes/_profile.md` for your translation library and track-specific positioning
+
+### 4. Open your AI tool
 
 ```bash
 claude
 ```
 
-Then paste a job offer URL or description. Career-ops will automatically evaluate it, generate a report, create a tailored PDF, and track it.
+Then ask the tool to personalize the system. Examples:
+- "Set this up for medical affairs and life sciences consulting"
+- "Build an internship-friendly version for graduate students"
+- "Make health-tech my secondary track"
 
-## Available Commands
+### 5. Start using it
 
-| Action | How |
-|--------|-----|
-| Evaluate an offer | Paste a URL or JD text |
-| Search for offers | `/career-ops scan` |
-| Process pending URLs | `/career-ops pipeline` |
-| Generate a PDF | `/career-ops pdf` |
-| Batch evaluate | `/career-ops batch` |
-| Check tracker status | `/career-ops tracker` |
-| Fill application form | `/career-ops apply` |
+You can:
+- paste a JD or URL to evaluate it
+- run `/career-ops scan`
+- run `/career-ops pdf`
+- run `/career-ops batch`
 
-## Verify Setup
+## Validate setup
 
 ```bash
-node cv-sync-check.mjs      # Check configuration
-node verify-pipeline.mjs     # Check pipeline integrity
+node cv-sync-check.mjs
+node verify-pipeline.mjs
 ```
 
-## Build Dashboard (Optional)
+## Optional dashboard
 
 ```bash
 cd dashboard
 go build -o career-dashboard .
-./career-dashboard --path ..  # Opens TUI pipeline viewer
+./career-dashboard --path ..
 ```

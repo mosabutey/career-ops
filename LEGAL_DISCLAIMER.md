@@ -1,72 +1,80 @@
-# Legal Disclaimer & Acceptable Use
+# Legal Disclaimer and Acceptable Use
 
-## 1. Nature of the Project
+## 1. Nature of the project
 
-`career-ops` is a collection of Markdown prompts, Node.js scripts, and HTML templates. It is strictly a local execution tool. The maintainers do not host, deploy, or operate an AI system, nor do we provide API access to Large Language Models (LLMs).
+`Career-Ops LifeSci` is a local, open-source repository of prompts, scripts, templates, and workflow instructions. The maintainers do not run a hosted service, do not process user data on behalf of users, and do not provide LLM access.
 
-Users download the code, run it on their own machines, and connect it to their own AI provider (Anthropic, OpenAI, or any other). The maintainers have no visibility into, control over, or responsibility for how the tool is used after download.
+Users run the project on their own machines with their own AI tools and providers.
 
-## 2. Data Privacy (GDPR)
+## 2. Data and privacy
 
-The maintainers do not act as a Data Controller or Data Processor under GDPR or any other data protection regulation.
+- Your CV, contact information, and career materials stay under your control.
+- If you use an AI provider, your data goes directly to that provider according to their terms and privacy policy.
+- The maintainers do not collect analytics, telemetry, or user files through this repo.
+- Never commit personal data to a public fork.
 
-- All Personal Identifiable Information (PII) you input — CVs, contact details, career history — is processed locally on your machine.
-- When you use an AI CLI tool (Claude Code, Codex, OpenCode), your data is sent directly to the AI provider you chose. Review their privacy policies.
-- We do not collect analytics, telemetry, or usage data of any kind.
-- API keys, credentials, and personal files are gitignored by default. Never commit them to a public fork.
+## 3. AI-generated content
 
-## 3. AI Model Behavior
+AI systems can be useful and still be wrong.
 
-This tool interfaces with AI models via third-party CLI tools. The maintainers do not control these models and cannot guarantee their behavior.
+- They may hallucinate qualifications, employer details, compensation data, or suggested wording.
+- They may overstate fit if prompts are poorly configured.
+- They may produce language that sounds polished but is still inaccurate.
 
-- **Hallucinations:** AI models may fabricate skills, job history, qualifications, or company information. You must manually verify all generated documents before submitting them to an employer.
-- **Safety guardrails:** The default prompts instruct the AI never to auto-submit applications and to stop before the final send/apply action. However, AI compliance is not guaranteed. If you use different models, modify the system prompts, or override the safety instructions, you accept full responsibility for the AI's actions.
-- **Evaluation accuracy:** Job offer scores and recommendations are AI-generated opinions based on pattern matching, not professional career advice. They should inform your judgment, not replace it.
+You are responsible for reviewing every generated output before using it.
 
-## 4. Third-Party Platforms
+## 4. Acceptable use
 
-career-ops interacts with career portals and job boards (Greenhouse, Lever, Ashby, Workday, and others).
+Career-Ops LifeSci is designed for:
+- evaluating opportunities
+- organizing pipelines
+- generating tailored but truthful materials
+- supporting interview preparation
+- helping users reason about fit, positioning, and next steps
 
-- Users must comply with the Terms of Service of every platform they interact with.
-- Do not use this tool to scrape platforms that prohibit automated access.
-- Do not use this tool to spam employers, overwhelm ATS systems, or submit mass applications.
-- Any consequences from ToS violations — including IP bans, account restrictions, or legal action from platforms — are solely the responsibility of the user.
-- The maintainers actively reject contributions that facilitate ToS violations (see CONTRIBUTING.md).
+Career-Ops LifeSci is not designed for:
+- mass application spam
+- auto-submitting applications without human review
+- deceptive credential inflation
+- violating platform Terms of Service
+- harassment or manipulative outreach
 
-## 5. Acceptable Use
+## 5. Third-party platforms
 
-career-ops is designed to help individuals make better career decisions, not to automate away human judgment. Acceptable use includes:
+Users must comply with the Terms of Service of every job board, employer site, or networking platform they interact with.
 
-- Evaluating job offers to prioritize your time
-- Generating tailored CVs that you review and edit before submitting
-- Scanning public career pages for open positions
-- Tracking your application pipeline
+The project does not endorse:
+- scraping sites that prohibit automated access
+- bypassing platform safeguards
+- overwhelming employers with automated low-fit submissions
 
-Unacceptable use includes:
+## 6. Students, trainees, and career changers
 
-- Auto-submitting applications without human review
-- Scraping platforms that prohibit automated access
-- Submitting AI-generated content without verifying its accuracy
-- Using the tool to discriminate, deceive, or misrepresent qualifications
+This repo serves users at very different stages, including students, clinicians, researchers, and career changers. That does not change the core rule: all generated materials must remain truthful and responsibly reviewed.
 
-## 6. EU AI Act
+The system may help users translate experience, but it must not be used to invent it.
 
-Because this tool runs locally, is free, and is open-source, the maintainers are not placing an AI system on the market or putting one into service under the EU AI Act. Users who deploy the tool in a commercial or organizational context should assess their own obligations under the AI Act.
+## 7. No guarantees
 
-## 7. Indemnification
+Career-Ops LifeSci offers guidance, not guarantees.
 
-By using career-ops, you agree to indemnify, defend, and hold harmless the authors, contributors, and any affiliated parties from and against any and all claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising from your use of this software, your violation of these terms, or your violation of any third-party terms of service.
+The maintainers are not responsible for:
+- job outcomes
+- rejections
+- missed opportunities
+- account restrictions
+- employer reactions
+- provider costs
+- consequences from inaccurate user inputs or prompt edits
 
-## 8. Cost Responsibility
+## 8. Cost responsibility
 
-If you use paid AI providers (Anthropic API, OpenAI API, etc.), you are solely responsible for monitoring and managing your own token usage and associated costs. The maintainers are not responsible for unexpected charges.
+If you use paid AI providers, you are responsible for your own API or subscription costs.
 
-## 9. MIT License
+## 9. License and warranty
 
-As stated in the [LICENSE](LICENSE) file:
+This project is provided under the [MIT License](LICENSE) and is offered "as is" without warranty of any kind.
 
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+## 10. Updates
 
-## 10. Changes
-
-This disclaimer may be updated as the project evolves. Users are encouraged to review it periodically.
+This disclaimer may evolve as the project grows. Review it periodically, especially before using the project in a professional or organizational setting.

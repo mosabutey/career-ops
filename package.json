@@ -1,7 +1,7 @@
 {
-  "name": "career-ops",
+  "name": "career-ops-lifesci",
   "version": "1.0.0",
-  "description": "AI-powered job search pipeline built on Claude Code",
+  "description": "Career-Ops LifeSci - career operating system for opportunity evaluation, tailored documents, and pipeline tracking",
   "scripts": {
     "doctor": "node doctor.mjs",
     "verify": "node verify-pipeline.mjs",
@@ -15,12 +15,12 @@
     "rollback": "node update-system.mjs rollback",
     "liveness": "node check-liveness.mjs"
   },
-  "keywords": ["ai", "job-search", "claude-code", "career", "automation"],
-  "author": "Santiago Fernández de Valderrama <hi@santifer.io> (https://santifer.io)",
-  "homepage": "https://santifer.io",
+  "keywords": ["lifesci", "career", "job-search", "claude-code", "biopharma", "consulting", "healthtech"],
+  "author": "Mark Osabutey and contributors",
+  "homepage": "https://github.com/mosabutey/career-ops-lifesci",
   "repository": {
     "type": "git",
-    "url": "https://github.com/santifer/career-ops"
+    "url": "https://github.com/mosabutey/career-ops-lifesci"
   },
   "license": "MIT",
   "dependencies": {

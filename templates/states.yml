@@ -1,21 +1,24 @@
-# Career-Ops — Canonical States
-# Source of truth for career-ops (writer) and dashboard (reader).
+# Career-Ops LifeSci - Canonical States
+# Source of truth for Career-Ops LifeSci (writer) and dashboard (reader).
 # Both systems MUST use these exact states.
 #
 # Rule: The status field in applications.md must contain EXACTLY
 # one of these values (case-insensitive). No markdown bold (**),
 # no dates, no extra text. Dates go in the date column.
+#
+# Aliases below are legacy compatibility only. New writes should always use
+# the canonical English labels.
 
 states:
   - id: evaluated
     label: Evaluated
-    aliases: [evaluada]
+    aliases: [evaluada, conditional, hold, on hold, review]
     description: Offer evaluated with report, pending decision
     dashboard_group: evaluated
 
   - id: applied
     label: Applied
-    aliases: [aplicado, enviada, aplicada, sent]
+    aliases: [aplicado, enviada, aplicada, sent, submitted]
     description: Application submitted
     dashboard_group: applied
 
@@ -39,13 +42,13 @@ states:
 
   - id: rejected
     label: Rejected
-    aliases: [rechazado, rechazada]
+    aliases: [rechazado, rechazada, declined]
     description: Rejected by company
     dashboard_group: rejected
 
   - id: discarded
     label: Discarded
-    aliases: [descartado, descartada, cerrada, cancelada]
+    aliases: [descartado, descartada, cerrada, cancelada, closed, cancelled, canceled, duplicate, dup, repost]
     description: Discarded by candidate or offer closed
     dashboard_group: discarded
 

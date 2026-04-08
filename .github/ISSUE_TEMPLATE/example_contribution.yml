@@ -1,0 +1,27 @@
+name: Example Contribution
+description: Suggest or contribute a fictional example profile, CV, or onboarding path
+labels: ["documentation", "examples"]
+body:
+  - type: input
+    id: example_type
+    attributes:
+      label: Example type
+      placeholder: "e.g., MD to medical affairs, undergrad internship, postdoc to consulting"
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Why would this example help?
+      description: Explain which users are underserved without it.
+    validations:
+      required: true
+  - type: textarea
+    id: assets
+    attributes:
+      label: What should the example include?
+      description: CV, profile.yml, README walkthrough, scanner config, etc.
+  - type: markdown
+    attributes:
+      value: |
+        Use fictional or anonymized content only. Do not submit real personal documents.

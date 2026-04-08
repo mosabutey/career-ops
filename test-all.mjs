@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 
 /**
- * test-all.mjs — Comprehensive test suite for career-ops
+ * Comprehensive test suite for career-ops.
  *
  * Run before merging any PR or pushing changes.
  * Tests: syntax, scripts, dashboard, data contract, personal data, paths.
  *
  * Usage:
- *   node test-all.mjs           # Run all tests
- *   node test-all.mjs --quick   # Skip dashboard build (faster)
+ *   node test-all.mjs
+ *   node test-all.mjs --quick
  */
 
-import { execSync } from 'child_process';
-import { readFileSync, existsSync, readdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { spawnSync } from 'child_process';
+import { existsSync, readFileSync, readdirSync, unlinkSync } from 'fs';
+import { dirname, extname, join, relative } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -24,68 +24,110 @@ let passed = 0;
 let failed = 0;
 let warnings = 0;
 
-function pass(msg) { console.log(`  ✅ ${msg}`); passed++; }
-function fail(msg) { console.log(`  ❌ ${msg}`); failed++; }
-function warn(msg) { console.log(`  ⚠️  ${msg}`); warnings++; }
+function pass(msg) { console.log(`  [OK] ${msg}`); passed++; }
+function fail(msg) { console.log(`  [FAIL] ${msg}`); failed++; }
+function warn(msg) { console.log(`  [WARN] ${msg}`); warnings++; }
 
-function run(cmd, opts = {}) {
-  try {
-    return execSync(cmd, { cwd: ROOT, encoding: 'utf-8', timeout: 30000, ...opts }).trim();
-  } catch (e) {
-    return null;
-  }
+function runProcess(command, args, opts = {}) {
+  const result = spawnSync(command, args, {
+    cwd: ROOT,
+    encoding: 'utf-8',
+    timeout: 30000,
+    shell: false,
+    windowsHide: true,
+    ...opts,
+  });
+  const blocked = Boolean(result.error && /EPERM/i.test(result.error.message || ''));
+  return { ...result, blocked };
 }
 
-function fileExists(path) { return existsSync(join(ROOT, path)); }
-function readFile(path) { return readFileSync(join(ROOT, path), 'utf-8'); }
+function runNode(args, opts = {}) {
+  return runProcess(process.execPath, args, opts);
+}
 
-console.log('\n🧪 career-ops test suite\n');
+function fileExists(path) {
+  return existsSync(join(ROOT, path));
+}
 
-// ── 1. SYNTAX CHECKS ────────────────────────────────────────────
+function readFile(path) {
+  return readFileSync(join(ROOT, path), 'utf-8');
+}
+
+function walkFiles(dir, results = []) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === '.git' || entry.name === 'node_modules') continue;
+    const fullPath = join(dir, entry.name);
+    const relPath = relative(ROOT, fullPath).replace(/\\/g, '/');
+    if (entry.isDirectory()) {
+      walkFiles(fullPath, results);
+      continue;
+    }
+    results.push({ fullPath, relPath });
+  }
+  return results;
+}
+
+function allowedByPath(relPath, allowedList) {
+  return allowedList.some(allowed => relPath === allowed || relPath.startsWith(`${allowed}/`));
+}
+
+console.log('\ncareer-ops test suite\n');
 
 console.log('1. Syntax checks');
 
-const mjsFiles = readdirSync(ROOT).filter(f => f.endsWith('.mjs'));
-for (const f of mjsFiles) {
-  const result = run(`node --check ${f}`);
-  if (result !== null) {
-    pass(`${f} syntax OK`);
+const mjsFiles = readdirSync(ROOT)
+  .filter(file => file.endsWith('.mjs'))
+  .sort();
+
+for (const file of mjsFiles) {
+  const result = runNode(['--check', file]);
+  if (result.blocked) {
+    warn(`Subprocess syntax check skipped for ${file} (restricted environment)`);
+  } else if (result.status === 0) {
+    pass(`${file} syntax OK`);
   } else {
-    fail(`${f} has syntax errors`);
+    fail(`${file} has syntax errors`);
   }
 }
-
-// ── 2. SCRIPT EXECUTION ─────────────────────────────────────────
 
 console.log('\n2. Script execution (graceful on empty data)');
 
 const scripts = [
-  { name: 'cv-sync-check.mjs', expectExit: 1, allowFail: true }, // fails without cv.md (normal in repo)
-  { name: 'verify-pipeline.mjs', expectExit: 0 },
-  { name: 'normalize-statuses.mjs', expectExit: 0 },
-  { name: 'dedup-tracker.mjs', expectExit: 0 },
-  { name: 'merge-tracker.mjs', expectExit: 0 },
-  { name: 'update-system.mjs check', expectExit: 0 },
+  { args: ['cv-sync-check.mjs'], expectExit: 1, allowFail: true },
+  { args: ['verify-pipeline.mjs'], expectExit: 0 },
+  { args: ['normalize-statuses.mjs', '--dry-run'], expectExit: 0 },
+  { args: ['dedup-tracker.mjs', '--dry-run'], expectExit: 0 },
+  { args: ['merge-tracker.mjs', '--dry-run'], expectExit: 0 },
+  { args: ['update-system.mjs', 'check'], expectExit: 0 },
 ];
 
-for (const { name, allowFail } of scripts) {
-  const result = run(`node ${name} 2>&1`);
-  if (result !== null) {
+for (const { args, expectExit, allowFail } of scripts) {
+  const result = runNode(args);
+  const name = args.join(' ');
+  if (result.blocked) {
+    warn(`${name} subprocess check skipped (restricted environment)`);
+  } else if (result.status === expectExit) {
     pass(`${name} runs OK`);
-  } else if (allowFail) {
+  } else if (allowFail && result.status !== 0) {
     warn(`${name} exited with error (expected without user data)`);
   } else {
     fail(`${name} crashed`);
   }
 }
 
-// ── 3. DASHBOARD BUILD ──────────────────────────────────────────
-
 if (!QUICK) {
   console.log('\n3. Dashboard build');
-  const goBuild = run('cd dashboard && go build -o /tmp/career-dashboard-test . 2>&1');
-  if (goBuild !== null) {
+  const outputName = process.platform === 'win32' ? 'career-dashboard-test.exe' : 'career-dashboard-test';
+  const outputPath = join(ROOT, 'dashboard', outputName);
+  const goBuild = runProcess('go', ['build', '-o', outputPath, '.'], {
+    cwd: join(ROOT, 'dashboard'),
+    timeout: 60000,
+  });
+  if (goBuild.blocked) {
+    warn('Dashboard build skipped (restricted environment)');
+  } else if (goBuild.status === 0) {
     pass('Dashboard compiles');
+    if (existsSync(outputPath)) unlinkSync(outputPath);
   } else {
     fail('Dashboard build failed');
   }
@@ -93,67 +135,87 @@ if (!QUICK) {
   console.log('\n3. Dashboard build (skipped --quick)');
 }
 
-// ── 4. DATA CONTRACT ────────────────────────────────────────────
-
 console.log('\n4. Data contract validation');
 
-// Check system files exist
 const systemFiles = [
-  'CLAUDE.md', 'VERSION', 'DATA_CONTRACT.md',
-  'modes/_shared.md', 'modes/_profile.template.md',
-  'modes/oferta.md', 'modes/pdf.md', 'modes/scan.md',
-  'templates/states.yml', 'templates/cv-template.html',
+  'AGENTS.md',
+  'CLAUDE.md',
+  'VERSION',
+  'DATA_CONTRACT.md',
+  'tracker-contract.mjs',
+  'modes/_shared.md',
+  'modes/_profile.template.md',
+  'modes/evaluate.md',
+  'modes/compare.md',
+  'modes/contact.md',
+  'modes/oferta.md',
+  'modes/pdf.md',
+  'modes/scan.md',
+  'templates/states.yml',
+  'templates/cv-template.html',
   '.claude/skills/career-ops/SKILL.md',
+  '.agents/skills/career-ops/SKILL.md',
 ];
 
-for (const f of systemFiles) {
-  if (fileExists(f)) {
-    pass(`System file exists: ${f}`);
+for (const file of systemFiles) {
+  if (fileExists(file)) {
+    pass(`System file exists: ${file}`);
   } else {
-    fail(`Missing system file: ${f}`);
+    fail(`Missing system file: ${file}`);
   }
 }
 
-// Check user files are NOT tracked (gitignored)
 const userFiles = [
-  'config/profile.yml', 'modes/_profile.md', 'portals.yml',
+  'config/profile.yml',
+  'modes/_profile.md',
+  'portals.yml',
 ];
-for (const f of userFiles) {
-  const tracked = run(`git ls-files ${f}`);
-  if (tracked === '') {
-    pass(`User file gitignored: ${f}`);
-  } else if (tracked === null) {
-    pass(`User file gitignored: ${f}`);
+
+for (const file of userFiles) {
+  const tracked = runProcess('git', ['ls-files', '--error-unmatch', file]);
+  if (tracked.status === 0) {
+    fail(`User file IS tracked (should be gitignored): ${file}`);
   } else {
-    fail(`User file IS tracked (should be gitignored): ${f}`);
+    pass(`User file gitignored: ${file}`);
   }
 }
-
-// ── 5. PERSONAL DATA LEAK CHECK ─────────────────────────────────
 
 console.log('\n5. Personal data leak check');
 
 const leakPatterns = [
-  'Santiago', 'santifer.io', 'Santifer iRepair', 'Zinkee', 'ALMAS',
-  'hi@santifer.io', '688921377', '/Users/santifer/',
+  'Santiago',
+  'santifer.io',
+  'Santifer iRepair',
+  'Zinkee',
+  'ALMAS',
+  'hi@santifer.io',
+  '688921377',
+  '/Users/santifer/',
+];
+const scanExtensions = new Set(['.md', '.yml', '.html', '.mjs', '.sh', '.go', '.json']);
+const allowedLeakPaths = [
+  'README.md',
+  'README.es.md',
+  'LICENSE',
+  'CITATION.cff',
+  'CONTRIBUTING.md',
+  'package.json',
+  '.github/FUNDING.yml',
+  'CLAUDE.md',
+  'AGENTS.md',
+  'test-all.mjs',
+  '.github/ISSUE_TEMPLATE',
+  'dashboard/internal/ui/screens/pipeline.go',
 ];
 
-const scanExtensions = ['md', 'yml', 'html', 'mjs', 'sh', 'go', 'json'];
-const excludeDirs = ['node_modules', '.git', 'dashboard/go.sum'];
-const allowedFiles = ['README.md', 'LICENSE', 'CITATION.cff', 'CONTRIBUTING.md',
-  'package.json', '.github/FUNDING.yml', 'CLAUDE.md', 'go.mod', 'test-all.mjs'];
-
 let leakFound = false;
-for (const pattern of leakPatterns) {
-  const result = run(
-    `grep -rn "${pattern}" --include="*.{${scanExtensions.join(',')}}" . 2>/dev/null | grep -v node_modules | grep -v ".git/" | grep -v go.sum`
-  );
-  if (result) {
-    for (const line of result.split('\n')) {
-      const file = line.split(':')[0].replace('./', '');
-      if (allowedFiles.some(a => file.includes(a))) continue;
-      if (file.includes('dashboard/go.mod')) continue;
-      warn(`Possible personal data in ${file}: "${pattern}"`);
+for (const { fullPath, relPath } of walkFiles(ROOT)) {
+  if (!scanExtensions.has(extname(relPath))) continue;
+  if (allowedByPath(relPath, allowedLeakPaths) || relPath === 'dashboard/go.sum') continue;
+  const content = readFileSync(fullPath, 'utf-8');
+  for (const pattern of leakPatterns) {
+    if (content.includes(pattern)) {
+      warn(`Possible personal data in ${relPath}: "${pattern}"`);
       leakFound = true;
     }
   }
@@ -162,29 +224,53 @@ if (!leakFound) {
   pass('No personal data leaks outside allowed files');
 }
 
-// ── 6. ABSOLUTE PATH CHECK ──────────────────────────────────────
-
 console.log('\n6. Absolute path check');
 
-const absPathResult = run(
-  `grep -rn "/Users/" --include="*.mjs" --include="*.sh" --include="*.md" --include="*.go" --include="*.yml" . 2>/dev/null | grep -v node_modules | grep -v ".git/" | grep -v README.md | grep -v LICENSE | grep -v go.sum | grep -v CLAUDE.md | grep -v test-all.mjs`
-);
-if (!absPathResult) {
-  pass('No absolute paths in code files');
-} else {
-  for (const line of absPathResult.split('\n').filter(Boolean)) {
-    fail(`Absolute path: ${line.slice(0, 100)}`);
+const absPathExtensions = new Set(['.mjs', '.sh', '.md', '.go', '.yml']);
+const allowedPathRefs = [
+  'README.md',
+  'LICENSE',
+  'CLAUDE.md',
+  'AGENTS.md',
+  'test-all.mjs',
+];
+
+let absPathFound = false;
+for (const { fullPath, relPath } of walkFiles(ROOT)) {
+  if (!absPathExtensions.has(extname(relPath))) continue;
+  if (allowedByPath(relPath, allowedPathRefs) || relPath === 'dashboard/go.sum') continue;
+  const content = readFileSync(fullPath, 'utf-8');
+  if (content.includes('/Users/') || content.includes('C:\\Users\\')) {
+    fail(`Absolute path found in ${relPath}`);
+    absPathFound = true;
   }
 }
-
-// ── 7. MODE FILE INTEGRITY ──────────────────────────────────────
+if (!absPathFound) {
+  pass('No absolute paths in code files');
+}
 
 console.log('\n7. Mode file integrity');
 
 const expectedModes = [
-  '_shared.md', '_profile.template.md', 'oferta.md', 'pdf.md', 'scan.md',
-  'batch.md', 'apply.md', 'auto-pipeline.md', 'contacto.md', 'deep.md',
-  'ofertas.md', 'pipeline.md', 'project.md', 'tracker.md', 'training.md',
+  '_shared.md',
+  '_profile.template.md',
+  'evaluate.md',
+  'compare.md',
+  'contact.md',
+  'oferta.md',
+  'ofertas.md',
+  'contacto.md',
+  'pdf.md',
+  'scan.md',
+  'batch.md',
+  'apply.md',
+  'auto-pipeline.md',
+  'deep.md',
+  'interview-prep.md',
+  'pipeline.md',
+  'project.md',
+  'tracker.md',
+  'training.md',
 ];
 
 for (const mode of expectedModes) {
@@ -195,7 +281,6 @@ for (const mode of expectedModes) {
   }
 }
 
-// Check _shared.md references _profile.md
 const shared = readFile('modes/_shared.md');
 if (shared.includes('_profile.md')) {
   pass('_shared.md references _profile.md');
@@ -203,15 +288,18 @@ if (shared.includes('_profile.md')) {
   fail('_shared.md does NOT reference _profile.md');
 }
 
-// ── 8. CLAUDE.md INTEGRITY ──────────────────────────────────────
-
 console.log('\n8. CLAUDE.md integrity');
 
 const claude = readFile('CLAUDE.md');
 const requiredSections = [
-  'Data Contract', 'Update Check', 'Ethical Use',
-  'Offer Verification', 'Canonical States', 'TSV Format',
-  'First Run', 'Onboarding',
+  'Data Contract',
+  'Update Check',
+  'Ethical Use',
+  'Offer Verification',
+  'Canonical States',
+  'TSV Format',
+  'First Run',
+  'Onboarding',
 ];
 
 for (const section of requiredSections) {
@@ -221,8 +309,6 @@ for (const section of requiredSections) {
     fail(`CLAUDE.md missing section: ${section}`);
   }
 }
-
-// ── 9. VERSION FILE ─────────────────────────────────────────────
 
 console.log('\n9. Version file');
 
@@ -237,18 +323,16 @@ if (fileExists('VERSION')) {
   fail('VERSION file missing');
 }
 
-// ── SUMMARY ─────────────────────────────────────────────────────
-
 console.log('\n' + '='.repeat(50));
-console.log(`📊 Results: ${passed} passed, ${failed} failed, ${warnings} warnings`);
+console.log(`Results: ${passed} passed, ${failed} failed, ${warnings} warnings`);
 
 if (failed > 0) {
-  console.log('🔴 TESTS FAILED — do NOT push/merge until fixed\n');
+  console.log('TESTS FAILED - do NOT push/merge until fixed\n');
   process.exit(1);
 } else if (warnings > 0) {
-  console.log('🟡 Tests passed with warnings — review before pushing\n');
+  console.log('Tests passed with warnings - review before pushing\n');
   process.exit(0);
 } else {
-  console.log('🟢 All tests passed — safe to push/merge\n');
+  console.log('All tests passed - safe to push/merge\n');
   process.exit(0);
 }

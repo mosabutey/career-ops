@@ -9,9 +9,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/santifer/career-ops/dashboard/internal/data"
-	"github.com/santifer/career-ops/dashboard/internal/theme"
-	"github.com/santifer/career-ops/dashboard/internal/ui/screens"
+	"github.com/mosabutey/career-ops-lifesci/dashboard/internal/data"
+	"github.com/mosabutey/career-ops-lifesci/dashboard/internal/theme"
+	"github.com/mosabutey/career-ops-lifesci/dashboard/internal/ui/screens"
 )
 
 type viewState int
@@ -47,8 +47,8 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 
 	case screens.PipelineLoadReportMsg:
-		archetype, tldr, remote, comp := data.LoadReportSummary(msg.CareerOpsPath, msg.ReportPath)
-		m.pipeline.EnrichReport(msg.ReportPath, archetype, tldr, remote, comp)
+		track, careerStage, tldr, remote, comp := data.LoadReportSummary(msg.CareerOpsPath, msg.ReportPath)
+		m.pipeline.EnrichReport(msg.ReportPath, track, careerStage, tldr, remote, comp)
 		return m, nil
 
 	case screens.PipelineUpdateStatusMsg:
@@ -141,9 +141,9 @@ func main() {
 		if app.ReportPath == "" {
 			continue
 		}
-		archetype, tldr, remote, comp := data.LoadReportSummary(careerOpsPath, app.ReportPath)
-		if archetype != "" || tldr != "" || remote != "" || comp != "" {
-			pm.EnrichReport(app.ReportPath, archetype, tldr, remote, comp)
+		track, careerStage, tldr, remote, comp := data.LoadReportSummary(careerOpsPath, app.ReportPath)
+		if track != "" || careerStage != "" || tldr != "" || remote != "" || comp != "" {
+			pm.EnrichReport(app.ReportPath, track, careerStage, tldr, remote, comp)
 		}
 	}
 

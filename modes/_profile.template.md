@@ -2,101 +2,103 @@
 
 <!-- ============================================================
      THIS FILE IS YOURS. It will NEVER be auto-updated.
-     
-     Customize everything here: your archetypes, narrative,
-     proof points, negotiation scripts, location policy.
-     
-     The system reads _shared.md (updatable) first, then this
-     file (your overrides). Your customizations always win.
+
+     Use it as a translation library for your own career story.
+     The system reads modes/_shared.md first, then this file.
+     Your customizations here always win.
      ============================================================ -->
 
-## Your Target Roles
+## Your Career Tracks
 
-<!-- Replace these with YOUR target roles. Examples:
-     - Senior Backend Engineer / Staff Platform Engineer
-     - AI Product Manager / Technical PM
-     - Data Engineer / ML Engineer
-     - DevOps / SRE / Platform
-     Whatever you're optimizing for. -->
+| Role pack | Why it fits you | What employers buy |
+|-----------|-----------------|--------------------|
+| **Biopharma / Medical** | Scientific and clinical credibility, evidence interpretation, external communication | Someone who can explain science, represent evidence, and build trust with clinicians or cross-functional teams |
+| **Life Sciences Consulting** | Structured problem solving, synthesis, decision support, executive communication | Someone who can turn complex information into commercial or strategic recommendations |
+| **Health-Tech / Scientific** | Product empathy, systems thinking, scientific communication, workflow awareness | Someone who can connect scientific or clinical reality to a usable product or service |
+| **Adjacent Generalist** | Leadership, execution, stakeholder alignment, breadth | Someone who can operate across functions and make ambiguity manageable |
 
-| Archetype | Thematic axes | What they buy |
-|-----------|---------------|---------------|
-| **AI Platform / LLMOps Engineer** | Evaluation, observability, reliability, pipelines | Someone who puts AI in production with metrics |
-| **Agentic Workflows / Automation** | HITL, tooling, orchestration, multi-agent | Someone who builds reliable agent systems |
-| **Technical AI Product Manager** | GenAI/Agents, PRDs, discovery, delivery | Someone who translates business to AI product |
-| **AI Solutions Architect** | Hyperautomation, enterprise, integrations | Someone who designs end-to-end AI architectures |
-| **AI Forward Deployed Engineer** | Client-facing, fast delivery, prototyping | Someone who delivers AI solutions to clients fast |
-| **AI Transformation Lead** | Change management, adoption, org enablement | Someone who leads AI transformation in an org |
+## Your Career Stage
 
-## Your Adaptive Framing
+| Stage | What to emphasize | What to de-emphasize |
+|-------|-------------------|----------------------|
+| **student_early** | Learning velocity, initiative, internships, course or lab ownership, teachability | Seniority claims you cannot support |
+| **advanced_training** | Depth, rigor, transferable leadership, cross-functional maturity, evidence-based thinking | Over-explaining academic prestige without business relevance |
+| **experienced_professional** | Scope, leadership, repeated delivery, stakeholder influence, clear leverage | Trying to sound junior just to seem flexible |
 
-<!-- Map YOUR projects to each archetype. Example:
-     | Platform / LLMOps | My monitoring dashboard project | article-digest.md |
-     | Agentic | My chatbot with HITL escalation | cv.md section 3 | -->
+## What You Actually Did
 
-| If the role is... | Emphasize about you... | Proof point sources |
-|-------------------|------------------------|---------------------|
-| Platform / LLMOps | Production systems builder, observability, evals | article-digest.md + cv.md |
-| Agentic / Automation | Multi-agent orchestration, HITL, reliability | article-digest.md + cv.md |
-| Technical AI PM | Product discovery, PRDs, metrics | cv.md + article-digest.md |
-| Solutions Architect | System design, integrations, enterprise-ready | article-digest.md + cv.md |
-| Forward Deployed Engineer | Fast delivery, client-facing, prototype to prod | cv.md + article-digest.md |
-| AI Transformation Lead | Change management, team enablement, adoption | cv.md + article-digest.md |
+- Research:
+- Clinical:
+- Operations:
+- Teaching / mentoring:
+- Analysis / modeling:
+- Writing / communication:
+- Leadership:
 
-## Your Exit Narrative
+## What That Means In Different Employer Contexts
 
-<!-- Replace with YOUR story. This frames everything. -->
+| If the employer is hiring for... | Translate your background as... | Proof point sources |
+|----------------------------------|---------------------------------|---------------------|
+| Medical affairs / MSL | Scientific credibility, evidence interpretation, clinician communication, trust-building | cv.md + article-digest.md |
+| Consulting / diligence | Structured analysis, synthesis, executive-ready communication, fast learning | cv.md + article-digest.md |
+| Health-tech / product / strategy | Clinical or scientific workflow insight, systems thinking, cross-functional collaboration | cv.md + article-digest.md |
+| Generalist strategy / operations | Ambiguity navigation, leadership, project ownership, stakeholder alignment | cv.md + article-digest.md |
 
-Use the candidate's exit story from `config/profile.yml` to frame ALL content:
-- **In PDF Summaries:** Bridge from past to future
-- **In STAR stories:** Reference proof points from article-digest.md
-- **In Draft Answers:** The transition narrative appears in the first response
+## Your Transferable Strengths
 
-## Your Cross-cutting Advantage
+- Strength 1:
+- Strength 2:
+- Strength 3:
+- Strength 4:
 
-<!-- What's your "signature move"? What do you do that others can't? -->
+## Hidden Assets The System Should Surface
 
-Frame profile as **"Technical builder with real-world proof"** that adapts framing to the role.
+- Teaching or tutoring experience that proves communication range
+- Mentoring or leadership in labs, clinics, or student groups
+- Protocol design, study execution, or process improvement
+- Writing, presenting, or educating different audiences
+- Tooling, analytics, automation, or operational improvement work
 
-## Your Portfolio / Demo
+## Your Proof Points
 
-<!-- If you have a live demo, dashboard, or public project:
-     url: https://yoursite.dev/demo
-     password: demo-2026
-     when_to_share: "LLMOps, AI Platform roles" -->
+| Proof point | Why it matters | Best-fit role packs |
+|-------------|----------------|---------------------|
+| Example: Secured grant funding | Signals trust, rigor, and initiative | biopharma_medical / consulting |
+| Example: Improved workflow time by 30% | Signals operations and impact | healthtech_scientific / adjacent_generalist |
 
-If you have a live demo/dashboard (check profile.yml), offer access in applications for relevant roles.
+## Objections And Reframes
 
-## Your Comp Targets
+| Employer worry | Reframe |
+|----------------|---------|
+| "Too academic" | Translate depth into decision quality, rigor, and fast learning |
+| "Not enough industry" | Show adjacent evidence, stakeholder work, and relevant outputs |
+| "Broad background" | Position breadth as range plus a clear through-line |
 
-<!-- Research comp ranges for YOUR target roles -->
+## Role-Pack Variants
 
-**General guidance:**
-- Use WebSearch for current market data (Glassdoor, Levels.fyi, Blind)
-- Frame by role title, not by skills
-- Contractor rates are typically 30-50% higher than employee base
+### Biopharma / Medical
+- Emphasize:
+- Avoid:
+- Best story:
 
-## Your Negotiation Scripts
+### Life Sciences Consulting
+- Emphasize:
+- Avoid:
+- Best story:
 
-<!-- Adapt to YOUR situation, currency, location -->
+### Health-Tech / Scientific
+- Emphasize:
+- Avoid:
+- Best story:
 
-**Salary expectations:**
-> "Based on market data for this role, I'm targeting [RANGE from profile.yml]. I'm flexible on structure -- what matters is the total package and the opportunity."
+### Adjacent Generalist
+- Emphasize:
+- Avoid:
+- Best story:
 
-**Geographic discount pushback:**
-> "The roles I'm competitive for are output-based, not location-based. My track record doesn't change based on postal code."
+## Negotiation and Decision Rules
 
-**When offered below target:**
-> "I'm comparing with opportunities in the [higher range]. I'm drawn to [company] because of [reason]. Can we explore [target]?"
-
-## Your Location Policy
-
-<!-- Adapt to YOUR situation -->
-
-**In forms:**
-- Follow your actual availability from profile.yml
-- Specify timezone overlap in free-text fields
-
-**In evaluations (scoring):**
-- Remote dimension for hybrid outside your country: score **3.0** (not 1.0)
-- Only score 1.0 if JD says "must be on-site 4-5 days/week, no exceptions"
+- Walk-away rules:
+- Flexibility on location or travel:
+- Signals that make a role worth stretching for:
+- Signals that make a role a poor use of time:

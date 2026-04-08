@@ -1,76 +1,93 @@
 # Customization Guide
 
-## Profile (config/profile.yml)
+Career-Ops LifeSci is designed to be adapted quickly.
 
-This is the single source of truth for your identity. All modes read from here.
+The shared system lives in the repo. Your personal strategy belongs in:
+- `config/profile.yml`
+- `modes/_profile.md`
+- `cv.md`
+- `article-digest.md`
+- `portals.yml`
 
-Key sections:
-- **candidate**: Name, email, phone, location, LinkedIn, portfolio
-- **target_roles**: Your North Star roles and archetypes
-- **narrative**: Your headline, exit story, superpowers, proof points
-- **compensation**: Target range, minimum, currency
-- **location**: Country, timezone, visa status, on-site availability
+## 1. Profile (`config/profile.yml`)
 
-## Target Roles (modes/_shared.md)
+This is the single source of truth for:
+- who you are
+- what stage you are in
+- which role packs matter most
+- your markets, compensation, and work constraints
+- your narrative, proof themes, and deal-breakers
 
-The archetype table in `_shared.md` determines how offers are scored and CVs are framed. Edit the table to match YOUR career targets:
+Customize:
+- `candidate`
+- `authorization`
+- `career_strategy`
+- `role_packs`
+- `narrative`
+- `deal_breakers`
+- `document_strategy`
 
-```markdown
-| Archetype | Thematic axes | What they buy |
-|-----------|---------------|---------------|
-| **Your Role 1** | key skills | what they need |
-| **Your Role 2** | key skills | what they need |
-```
+For international candidates, use `authorization` to record:
+- whether you can work now
+- whether you need immediate sponsorship
+- whether you will need future sponsorship
+- your current basis for work authorization
+- your authorization end date
+- your preferred default when postings are silent
 
-Also update the "Adaptive Framing" table to map YOUR specific projects to each archetype.
+## 2. Translation library (`modes/_profile.md`)
 
-## Portals (portals.yml)
+This file teaches the system how to talk about you.
+
+Use it to record:
+- what you actually did
+- how that maps into different employer contexts
+- transferable strengths
+- hidden assets
+- objections and reframes
+- track-specific positioning
+
+## 3. Scanner targeting (`portals.yml`)
 
 Copy from `templates/portals.example.yml` and customize:
+- title keywords
+- role packs
+- career stages
+- employer lists
+- search queries
 
-1. **title_filter.positive**: Keywords matching your target roles
-2. **title_filter.negative**: Tech stacks or domains to exclude
-3. **search_queries**: WebSearch queries for job boards (Ashby, Greenhouse, Lever)
-4. **tracked_companies**: Companies to check directly
+If you are targeting internships or fellowships, keep stage-specific keywords enabled.
 
-## CV Template (templates/cv-template.html)
+You can also tune sponsorship detection by editing:
+- `sponsorship_signals.explicit_open`
+- `sponsorship_signals.explicit_closed`
+- `sponsorship_signals.restricted`
 
-The HTML template uses these design tokens:
-- **Fonts**: Space Grotesk (headings) + DM Sans (body) -- self-hosted in `fonts/`
-- **Colors**: Cyan primary (`hsl(187,74%,32%)`) + Purple accent (`hsl(270,70%,45%)`)
-- **Layout**: Single-column, ATS-optimized
+Recommended default:
+- treat explicit no-sponsorship language as a serious negative
+- treat explicit sponsorship support as a positive
+- do not auto-skip when the posting is silent
 
-To customize fonts/colors, edit the CSS in the template. Update font files in `fonts/` if switching fonts.
+## 4. Resume and PDF behavior (`modes/pdf.md`)
 
-## Negotiation Scripts (modes/_shared.md)
+The system supports multiple document families. Choose or customize:
+- medical affairs resume
+- consulting resume
+- health-tech resume
+- short industry CV
+- internship / externship / co-op variant
 
-The negotiation section provides frameworks for salary discussions. Replace the example scripts with your own:
-- Target ranges
-- Geographic arbitrage strategy
-- Pushback responses
+Keep the facts the same. Change the framing, section order, and vocabulary.
 
-## Hooks (Optional)
+## 5. Shared system logic (`modes/_shared.md`)
 
-Career-ops can integrate with external systems via Claude Code hooks. Example hooks:
+Only edit shared files when you are changing the product for everyone.
 
-```json
-{
-  "hooks": {
-    "SessionStart": [{
-      "hooks": [{
-        "type": "command",
-        "command": "echo 'Career-ops session started'"
-      }]
-    }]
-  }
-}
-```
+Examples:
+- adding a new role pack
+- improving stage logic
+- changing the common scoring rubric
+- improving international-candidate or sponsorship logic for everyone
+- strengthening global writing or ATS rules
 
-Save hooks in `.claude/settings.json`.
-
-## States (templates/states.yml)
-
-The canonical states rarely need changing. If you add new states, update:
-1. `templates/states.yml`
-2. `normalize-statuses.mjs` (alias mappings)
-3. `modes/_shared.md` (any references)
+Do not put private personal data here.

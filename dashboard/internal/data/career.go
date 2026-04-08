@@ -8,18 +8,19 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/santifer/career-ops/dashboard/internal/model"
+	"github.com/mosabutey/career-ops-lifesci/dashboard/internal/model"
 )
 
 var (
 	reReportLink     = regexp.MustCompile(`\[(\d+)\]\(([^)]+)\)`)
 	reScoreValue     = regexp.MustCompile(`(\d+\.?\d*)/5`)
-	reArchetype      = regexp.MustCompile(`(?i)\*\*Arquetipo(?:\s+detectado)?\*\*\s*\|\s*(.+)`)
+	reTrack          = regexp.MustCompile(`(?i)\*\*(?:Track|Archetype|Arquetipo)(?:\s+detectado)?\*\*\s*\|\s*(.+)`)
+	reCareerStage    = regexp.MustCompile(`(?i)\*\*Career Stage:\*\*\s*(.+)`)
 	reTlDr           = regexp.MustCompile(`(?i)\*\*TL;DR\*\*\s*\|\s*(.+)`)
 	reTlDrColon      = regexp.MustCompile(`(?i)\*\*TL;DR:\*\*\s*(.+)`)
 	reRemote         = regexp.MustCompile(`(?i)\*\*Remote\*\*\s*\|\s*(.+)`)
 	reComp           = regexp.MustCompile(`(?i)\*\*Comp\*\*\s*\|\s*(.+)`)
-	reArchetypeColon = regexp.MustCompile(`(?i)\*\*Arquetipo:\*\*\s*(.+)`)
+	reTrackColon     = regexp.MustCompile(`(?i)\*\*(?:Track|Archetype|Arquetipo):\*\*\s*(.+)`)
 	reReportURL      = regexp.MustCompile(`(?m)^\*\*URL:\*\*\s*(https?://\S+)`)
 	reBatchID        = regexp.MustCompile(`(?m)^\*\*Batch ID:\*\*\s*(\d+)`)
 )
@@ -40,7 +41,6 @@ func ParseApplications(careerOpsPath string) []model.CareerApplication {
 
 	lines := strings.Split(string(content), "\n")
 	apps := make([]model.CareerApplication, 0)
-	num := 0
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -74,9 +74,12 @@ func ParseApplications(careerOpsPath string) []model.CareerApplication {
 			continue
 		}
 
-		num++
+		number, err := strconv.Atoi(fields[0])
+		if err != nil {
+			continue
+		}
 		app := model.CareerApplication{
-			Number:  num,
+			Number:  number,
 			Date:    fields[1],
 			Company: fields[2],
 			Role:    fields[3],
@@ -280,10 +283,14 @@ func loadJobURLs(careerOpsPath string) map[string]string {
 
 // enrichFromScanHistory fills JobURL from scan-history.tsv by matching company name.
 func enrichFromScanHistory(careerOpsPath string, apps []model.CareerApplication) {
-	scanPath := filepath.Join(careerOpsPath, "scan-history.tsv")
+	scanPath := filepath.Join(careerOpsPath, "data", "scan-history.tsv")
 	scanData, err := os.ReadFile(scanPath)
 	if err != nil {
-		return
+		scanPath = filepath.Join(careerOpsPath, "scan-history.tsv")
+		scanData, err = os.ReadFile(scanPath)
+		if err != nil {
+			return
+		}
 	}
 
 	// Build company -> URL index from scan-history
@@ -498,7 +505,7 @@ func NormalizeStatus(raw string) string {
 }
 
 // LoadReportSummary extracts key fields from a report file.
-func LoadReportSummary(careerOpsPath, reportPath string) (archetype, tldr, remote, comp string) {
+func LoadReportSummary(careerOpsPath, reportPath string) (track, careerStage, tldr, remote, comp string) {
 	fullPath := filepath.Join(careerOpsPath, reportPath)
 	content, err := os.ReadFile(fullPath)
 	if err != nil {
@@ -506,10 +513,10 @@ func LoadReportSummary(careerOpsPath, reportPath string) (archetype, tldr, remot
 	}
 	text := string(content)
 
-	if m := reArchetype.FindStringSubmatch(text); m != nil {
-		archetype = cleanTableCell(m[1])
-	} else if m := reArchetypeColon.FindStringSubmatch(text); m != nil {
-		archetype = cleanTableCell(m[1])
+	if m := reTrack.FindStringSubmatch(text); m != nil {
+		track = cleanTableCell(m[1])
+	} else if m := reTrackColon.FindStringSubmatch(text); m != nil {
+		track = cleanTableCell(m[1])
 	}
 
 	// Try table-format TL;DR first (most reports), then colon format
@@ -525,6 +532,9 @@ func LoadReportSummary(careerOpsPath, reportPath string) (archetype, tldr, remot
 
 	if m := reComp.FindStringSubmatch(text); m != nil {
 		comp = cleanTableCell(m[1])
+	}
+	if m := reCareerStage.FindStringSubmatch(text); m != nil {
+		careerStage = cleanTableCell(m[1])
 	}
 
 	// Truncate long fields
@@ -557,7 +567,7 @@ func UpdateApplicationStatus(careerOpsPath string, app model.CareerApplication, 
 		// Match by report number
 		if app.ReportNumber != "" && strings.Contains(line, fmt.Sprintf("[%s]", app.ReportNumber)) {
 			// Replace the status field
-			lines[i] = replaceStatusInLine(line, app.Status, newStatus)
+			lines[i] = replaceStatusInLine(line, newStatus)
 			found = true
 			break
 		}
@@ -570,10 +580,14 @@ func UpdateApplicationStatus(careerOpsPath string, app model.CareerApplication, 
 	return os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
 }
 
-// replaceStatusInLine replaces the old status with new status in a table line.
-func replaceStatusInLine(line, oldStatus, newStatus string) string {
-	// Case-insensitive replacement of the status field
-	return strings.Replace(line, oldStatus, newStatus, 1)
+// replaceStatusInLine replaces only the status column in a tracker table line.
+func replaceStatusInLine(line, newStatus string) string {
+	parts := strings.Split(line, "|")
+	if len(parts) < 10 {
+		return line
+	}
+	parts[6] = " " + newStatus + " "
+	return strings.Join(parts, "|")
 }
 
 // cleanTableCell removes trailing pipes and whitespace from a table cell value.

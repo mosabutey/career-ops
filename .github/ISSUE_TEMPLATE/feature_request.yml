@@ -1,23 +1,28 @@
 name: Feature Request
-description: Suggest a new feature or improvement
+description: Suggest a feature, workflow improvement, or experience upgrade
 labels: ["enhancement"]
 body:
   - type: textarea
     id: problem
     attributes:
       label: Problem
-      description: What problem does this solve?
+      description: What user problem or limitation does this solve?
     validations:
       required: true
   - type: textarea
     id: solution
     attributes:
       label: Proposed solution
-      description: How would you like this to work?
+      description: How should the feature work?
     validations:
       required: true
+  - type: input
+    id: audience
+    attributes:
+      label: Primary audience
+      placeholder: "e.g., PhD candidates, medical affairs applicants, consulting interns"
   - type: markdown
     attributes:
       value: |
         ---
-        Built by [santifer](https://santifer.io) — see the [architecture docs](docs/ARCHITECTURE.md) for how the system works.
+        Career-Ops LifeSci is a community-first evolution of the original project by [santifer](https://santifer.io). Please keep contributions broad enough to help more than one user story.

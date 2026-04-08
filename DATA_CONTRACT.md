@@ -10,7 +10,7 @@ These files contain your personal data, customizations, and work product. Update
 |------|---------|
 | `cv.md` | Your CV in markdown |
 | `config/profile.yml` | Your identity, targets, comp range |
-| `modes/_profile.md` | Your archetypes, narrative, negotiation scripts |
+| `modes/_profile.md` | Your role-pack strategy, narrative, and negotiation scripts |
 | `article-digest.md` | Your proof points from portfolio |
 | `interview-prep/story-bank.md` | Your accumulated STAR+R stories |
 | `portals.yml` | Your customized company list |
@@ -28,15 +28,15 @@ These files contain system logic, scripts, templates, and instructions that impr
 | File | Purpose |
 |------|---------|
 | `modes/_shared.md` | Scoring system, global rules, tools |
-| `modes/oferta.md` | Evaluation mode instructions |
+| `modes/evaluate.md` | Evaluation mode instructions |
 | `modes/pdf.md` | PDF generation instructions |
 | `modes/scan.md` | Portal scanner instructions |
 | `modes/batch.md` | Batch processing instructions |
 | `modes/apply.md` | Application assistant instructions |
 | `modes/auto-pipeline.md` | Auto-pipeline instructions |
-| `modes/contacto.md` | LinkedIn outreach instructions |
+| `modes/contact.md` | LinkedIn outreach instructions |
 | `modes/deep.md` | Research prompt instructions |
-| `modes/ofertas.md` | Comparison instructions |
+| `modes/compare.md` | Comparison instructions |
 | `modes/pipeline.md` | Pipeline processing instructions |
 | `modes/project.md` | Project evaluation instructions |
 | `modes/tracker.md` | Tracker instructions |

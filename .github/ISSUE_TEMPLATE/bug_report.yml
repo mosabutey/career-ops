@@ -1,26 +1,31 @@
 name: Bug Report
-description: Report a bug in career-ops
+description: Report a bug in Career-Ops LifeSci
 labels: ["bug"]
 body:
   - type: textarea
     id: description
     attributes:
       label: What happened?
-      description: A clear description of the bug
+      description: Describe the bug clearly.
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
       label: Steps to reproduce
-      description: How can we reproduce this?
+      description: What should someone else do to reproduce it?
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
       label: Expected behavior
-      description: What should have happened?
+      description: What did you expect instead?
+  - type: input
+    id: audience
+    attributes:
+      label: Affected user path
+      placeholder: "e.g., student internship flow, medical affairs resume, consulting comparison"
   - type: input
     id: os
     attributes:
@@ -30,4 +35,4 @@ body:
     attributes:
       value: |
         ---
-        Built by [santifer](https://santifer.io) — need direct help? [Open a discussion](https://github.com/santifer/career-ops/discussions) or reach out at [santifer.io](https://santifer.io).
+        Please do not include personal CVs, private company data, or identifying information in bug reports.

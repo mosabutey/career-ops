@@ -1,266 +1,243 @@
-# Career-Ops
+# Career-Ops LifeSci
 
-[English](README.md) | [Español](README.es.md)
+English-first repository
 
 <p align="center">
-  <a href="https://x.com/santifer"><img src="docs/hero-banner.jpg" alt="Career-Ops — Multi-Agent Job Search System" width="800"></a>
+  <a href="https://github.com/mosabutey/career-ops-lifesci"><img src="docs/hero-banner.jpg" alt="Career-Ops LifeSci - Career Operating System" width="800"></a>
 </p>
 
 <p align="center">
-  <em>I spent months applying to jobs the hard way. So I engineered the system I wish I had.</em><br>
-  Companies use AI to filter candidates. <strong>I gave candidates AI to <em>choose</em> companies.</strong><br>
-  <em>Now it's open source.</em>
+  <em>Resumes and spreadsheets are not enough for modern career navigation.</em><br>
+  <strong>Career-Ops LifeSci helps ambitious people evaluate, target, position, package, and pursue the right opportunities with rigor.</strong><br>
+  <em>Built as a community-first evolution of an excellent open-source foundation.</em>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-000?style=flat&logo=anthropic&logoColor=white" alt="Claude Code">
   <img src="https://img.shields.io/badge/OpenCode-111827?style=flat&logo=terminal&logoColor=white" alt="OpenCode">
-  <img src="https://img.shields.io/badge/Codex_(soon)-6B7280?style=flat&logo=openai&logoColor=white" alt="Codex">
+  <img src="https://img.shields.io/badge/Codex-6B7280?style=flat&logo=openai&logoColor=white" alt="Codex">
   <img src="https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white" alt="Go">
   <img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat&logo=playwright&logoColor=white" alt="Playwright">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT">
-  <br>
-  <img src="https://img.shields.io/badge/EN-blue?style=flat" alt="EN">
-  <img src="https://img.shields.io/badge/ES-red?style=flat" alt="ES">
-  <img src="https://img.shields.io/badge/DE-grey?style=flat" alt="DE">
-  <img src="https://img.shields.io/badge/FR-blue?style=flat" alt="FR">
-  <img src="https://img.shields.io/badge/PT--BR-green?style=flat" alt="PT-BR">
 </p>
 
 ---
 
 <p align="center">
-  <img src="docs/demo.gif" alt="Career-Ops Demo" width="800">
+  <img src="docs/demo.gif" alt="Career-Ops LifeSci Demo" width="800">
 </p>
 
-<p align="center"><strong>740+ job listings evaluated · 100+ personalized CVs · 1 dream role landed</strong></p>
+## What This Is
 
-## What Is This
+Career-Ops LifeSci is an open-source career operating system for people navigating complex professional paths across science, medicine, consulting, health-tech, technical strategy, and adjacent industries.
 
-Career-Ops turns any AI coding CLI into a full job search command center. Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline that:
+It is designed for:
+- MDs, PhDs, MD-PhDs, postdocs, residents, fellows, and clinicians
+- graduate and undergraduate students
+- internship, externship, co-op, and fellowship applicants
+- international candidates navigating CPT, OPT, STEM OPT, J-1 pathways, and future sponsorship questions
+- career changers with deep but nontraditional experience
+- ambitious operators who need more than a resume, spreadsheet, and intuition
 
-- **Evaluates offers** with a structured A-F scoring system (10 weighted dimensions)
-- **Generates tailored PDFs** -- ATS-optimized CVs customized per job description
-- **Scans portals** automatically (Greenhouse, Ashby, Lever, company pages)
-- **Processes in batch** -- evaluate 10+ offers in parallel with sub-agents
-- **Tracks everything** in a single source of truth with integrity checks
+Career-Ops LifeSci is not just a resume tool. It helps you:
+- evaluate opportunities with structured judgment
+- identify fit across multiple role families
+- translate your experience into employer-relevant language
+- reason clearly about work authorization, sponsorship signals, and international-candidate constraints
+- generate tailored, ATS-safe documents
+- build opportunity pipelines and track decisions
+- move faster without losing rigor
 
-> **Important: This is NOT a spray-and-pray tool.** Career-ops is a filter -- it helps you find the few offers worth your time out of hundreds. The system strongly recommends against applying to anything scoring below 4.0/5. Your time is valuable, and so is the recruiter's. Always review before submitting.
+> **Important:** Career-Ops LifeSci is not a spray-and-pray bot. It is a decision-support system. It is designed to help you choose the right opportunities, not overwhelm employers with low-fit applications.
 
-Career-ops is agentic: Claude Code navigates career pages with Playwright, evaluates fit by reasoning about your CV vs the job description (not keyword matching), and adapts your resume per listing.
+## Why This Exists
 
-> **Heads up: the first evaluations won't be great.** The system doesn't know you yet. Feed it context -- your CV, your career story, your proof points, your preferences, what you're good at, what you want to avoid. The more you nurture it, the better it gets. Think of it as onboarding a new recruiter: the first week they need to learn about you, then they become invaluable.
+Modern career navigation is multidimensional. A strong candidate may simultaneously fit:
+- biotech or pharma medical-scientific roles
+- life sciences consulting or diligence work
+- health-tech strategy or scientific product roles
+- internships, fellowships, or other stage-specific entry paths
 
-Built by someone who used it to evaluate 740+ job offers, generate 100+ tailored CVs, and land a Head of Applied AI role. [Read the full case study](https://santifer.io/career-ops-system).
+Most people are told to reduce themselves to one title too early. Career-Ops LifeSci takes the opposite approach: it helps you manage opportunity intelligence, narrative positioning, and application quality across multiple plausible futures.
 
-## Features
+## Who It Serves First
 
-| Feature | Description |
-|---------|-------------|
-| **Auto-Pipeline** | Paste a URL, get a full evaluation + PDF + tracker entry |
-| **6-Block Evaluation** | Role summary, CV match, level strategy, comp research, personalization, interview prep (STAR+R) |
-| **Interview Story Bank** | Accumulates STAR+Reflection stories across evaluations -- 5-10 master stories that answer any behavioral question |
-| **Negotiation Scripts** | Salary negotiation frameworks, geographic discount pushback, competing offer leverage |
-| **ATS PDF Generation** | Keyword-injected CVs with Space Grotesk + DM Sans design |
-| **Portal Scanner** | 45+ companies pre-configured (Anthropic, OpenAI, ElevenLabs, Retool, n8n...) + custom queries across Ashby, Greenhouse, Lever, Wellfound |
-| **Batch Processing** | Parallel evaluation with `claude -p` workers |
-| **Dashboard TUI** | Terminal UI to browse, filter, and sort your pipeline |
-| **Human-in-the-Loop** | AI evaluates and recommends, you decide and act. The system never submits an application -- you always have the final call |
-| **Pipeline Integrity** | Automated merge, dedup, status normalization, health checks |
+Day-one audience order:
+1. Scientists and clinicians
+2. Broader career changers with deep transferable experience
+3. Students and trainees entering industry
+
+The repo supports role packs and career-stage paths from the start, so it can serve both an experienced physician-scientist and a graduate student pursuing a first industry internship.
+
+## Role Packs and Career Stages
+
+### Role packs
+
+- `biopharma_medical`: medical affairs, MSL, scientific affairs, clinical scientist, translational science, biomarker, and therapeutic-area roles
+- `life_sciences_consulting`: strategy, diligence, advisory, portfolio, and scientifically intensive consulting roles
+- `healthtech_scientific`: product, clinical strategy, medical content, partnerships, solutions, and scientific-product roles
+- `adjacent_generalist`: cross-functional roles where scientific or clinical credibility creates an edge
+
+### Career stages
+
+- `student_early`: undergraduate, graduate, internship, externship, co-op, trainee
+- `advanced_training`: PhD candidate, postdoc, resident, fellow, MD-PhD, research trainee
+- `experienced_professional`: clinician, scientist, consultant, operator, manager
+
+## Core Capabilities
+
+| Capability | What it does |
+|------------|--------------|
+| **Evaluate** | Scores a role, explains fit, gaps, risks, and positioning strategy |
+| **Compare** | Ranks multiple roles without flattening important trade-offs |
+| **PDF / Resume Generation** | Produces tailored ATS-safe resume variants for each role family |
+| **Scan** | Searches portals and company pages for new opportunities |
+| **Batch** | Processes multiple opportunities in parallel |
+| **Tracker** | Keeps a canonical application pipeline with integrity checks |
+| **Interview Prep** | Builds reusable stories, objections, and case-study framing |
+| **Contact** | Drafts role-aware outreach for networking and recruiter conversations |
 
 ## Quick Start
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/santifer/career-ops.git
-cd career-ops && npm install
-npx playwright install chromium   # Required for PDF generation
+git clone https://github.com/mosabutey/career-ops-lifesci.git
+cd career-ops-lifesci
+npm install
+npx playwright install chromium
 
-# 2. Check setup
-npm run doctor                     # Validates all prerequisites
+# 2. Configure your profile
+cp config/profile.example.yml config/profile.yml
+cp templates/portals.example.yml portals.yml
 
-# 3. Configure
-cp config/profile.example.yml config/profile.yml  # Edit with your details
-cp templates/portals.example.yml portals.yml       # Customize companies
+# 3. Add your source material
+# Create cv.md in the project root
+# Optional: create article-digest.md with proof points, publications, projects, awards
 
-# 4. Add your CV
-# Create cv.md in the project root with your CV in markdown
+# 4. Open your AI coding tool in this directory
+claude
 
-# 5. Personalize with Claude
-claude   # Open Claude Code in this directory
-
-# Then ask Claude to adapt the system to you:
-# "Change the archetypes to backend engineering roles"
-# "Translate the modes to English"
-# "Add these 5 companies to portals.yml"
-# "Update my profile with this CV I'm pasting"
-
-# 6. Start using
-# Paste a job URL or run /career-ops
+# 5. Ask it to personalize the system
+# "Set this up for biotech medical affairs and life sciences consulting roles"
+# "Build a student internship version for me"
+# "Tailor the scanner to neuro, oncology, and health-tech companies"
 ```
-
-> **The system is designed to be customized by Claude itself.** Modes, archetypes, scoring weights, negotiation scripts -- just ask Claude to change them. It reads the same files it uses, so it knows exactly what to edit.
 
 See [docs/SETUP.md](docs/SETUP.md) for the full setup guide.
 
-## Usage
+## Typical Workflows
 
-Career-ops is a single slash command with multiple modes:
+### Opportunity evaluation
 
-```
-/career-ops                → Show all available commands
-/career-ops {paste a JD}   → Full auto-pipeline (evaluate + PDF + tracker)
-/career-ops scan           → Scan portals for new offers
-/career-ops pdf            → Generate ATS-optimized CV
-/career-ops batch          → Batch evaluate multiple offers
-/career-ops tracker        → View application status
-/career-ops apply          → Fill application forms with AI
-/career-ops pipeline       → Process pending URLs
-/career-ops contacto       → LinkedIn outreach message
-/career-ops deep           → Deep company research
-/career-ops training       → Evaluate a course/cert
-/career-ops project        → Evaluate a portfolio project
-```
+Paste a job URL or JD text and get:
+- a structured evaluation report
+- a score with clear reasoning
+- a recommended resume variant
+- a tracker entry
 
-Or just paste a job URL or description directly -- career-ops auto-detects it and runs the full pipeline.
+### Role-family adaptation
+
+Ask the agent to adapt the repo to your path:
+- "Change the role packs to medtech commercialization and VC diligence"
+- "Support consulting internships and PhD fellowship applications"
+- "Make my default path medical affairs, with health-tech as secondary"
+
+### Stage-aware support
+
+Career-Ops LifeSci explicitly supports:
+- internships
+- externships
+- co-ops
+- fellowships
+- early-career associate roles
+- advanced training transitions
+- experienced professional pivots
+
+### International candidate support
+
+The repo can be configured for candidates who:
+- can work now but will need sponsorship later
+- need immediate sponsorship or transfer support
+- are pursuing internships or early-career roles through CPT, OPT, STEM OPT, J-1, or similar pathways
+
+The default policy is practical:
+- explicit no-sponsorship language is a real signal
+- explicit sponsorship support is a positive signal
+- silence is not an automatic rejection
+- citizenship or clearance requirements should be surfaced clearly
 
 ## How It Works
 
-```
-You paste a job URL or description
-        │
-        ▼
-┌──────────────────┐
-│  Archetype       │  Classifies: LLMOps / Agentic / PM / SA / FDE / Transformation
-│  Detection       │
-└────────┬─────────┘
-         │
-┌────────▼─────────┐
-│  A-F Evaluation  │  Match, gaps, comp research, STAR stories
-│  (reads cv.md)   │
-└────────┬─────────┘
-         │
-    ┌────┼────┐
-    ▼    ▼    ▼
- Report  PDF  Tracker
-  .md   .pdf   .tsv
+```text
+You provide a JD or URL
+        |
+        v
+Role-pack detection + career-stage detection
+        |
+        v
+Structured evaluation
+        |
+        +--> report (.md)
+        +--> tailored resume (.pdf)
+        +--> tracker TSV -> applications.md
 ```
 
-## Pre-configured Portals
+## Examples
 
-The scanner comes with **45+ companies** ready to scan and **19 search queries** across major job boards. Copy `templates/portals.example.yml` to `portals.yml` and add your own:
+Check the `examples/` directory for fictional setups covering multiple user types, including:
+- physician-scientist to medical affairs
+- graduate student to consulting internship
+- broader dual-track profiles
 
-**AI Labs:** Anthropic, OpenAI, Mistral, Cohere, LangChain, Pinecone
-**Voice AI:** ElevenLabs, PolyAI, Parloa, Hume AI, Deepgram, Vapi, Bland AI
-**AI Platforms:** Retool, Airtable, Vercel, Temporal, Glean, Arize AI
-**Contact Center:** Ada, LivePerson, Sierra, Decagon, Talkdesk, Genesys
-**Enterprise:** Salesforce, Twilio, Gong, Dialpad
-**LLMOps:** Langfuse, Weights & Biases, Lindy, Cognigy, Speechmatics
-**Automation:** n8n, Zapier, Make.com
-**European:** Factorial, Attio, Tinybird, Clarity AI, Travelperk
+## Public-Facing Principles
 
-**Job boards searched:** Ashby, Greenhouse, Lever, Wellfound, Workable, RemoteFront
+- Quality over quantity
+- Honest evidence over inflated narratives
+- Local-first data handling
+- Human review before any application is sent
+- Broad usefulness beyond one founder or one career arc
 
-## Dashboard TUI
+## Acknowledgment
 
-The built-in terminal dashboard lets you browse your pipeline visually:
+This repo is a community-first evolution of the original [career-ops](https://github.com/santifer/career-ops) by [santifer](https://santifer.io), whose work demonstrated how powerful local-first, agentic job-search tooling can be.
 
-```bash
-cd dashboard
-go build -o career-dashboard .
-./career-dashboard --path ..
-```
+This fork expands that foundation toward scientific, clinical, consulting, health-tech, student, and multidomain career navigation.
 
-Features: 6 filter tabs, 4 sort modes, grouped/flat view, lazy-loaded previews, inline status changes.
+The portfolio that accompanied the original project is also open source: [cv-santiago](https://github.com/santifer/cv-santiago).
 
 ## Project Structure
 
-```
-career-ops/
-├── CLAUDE.md                    # Agent instructions
-├── cv.md                        # Your CV (create this)
-├── article-digest.md            # Your proof points (optional)
-├── config/
-│   └── profile.example.yml      # Template for your profile
-├── modes/                       # 14 skill modes
-│   ├── _shared.md               # Shared context (customize this)
-│   ├── oferta.md                # Single evaluation
-│   ├── pdf.md                   # PDF generation
-│   ├── scan.md                  # Portal scanner
-│   ├── batch.md                 # Batch processing
-│   └── ...
-├── templates/
-│   ├── cv-template.html         # ATS-optimized CV template
-│   ├── portals.example.yml      # Scanner config template
-│   └── states.yml               # Canonical statuses
-├── batch/
-│   ├── batch-prompt.md          # Self-contained worker prompt
-│   └── batch-runner.sh          # Orchestrator script
-├── dashboard/                   # Go TUI pipeline viewer
-├── data/                        # Your tracking data (gitignored)
-├── reports/                     # Evaluation reports (gitignored)
-├── output/                      # Generated PDFs (gitignored)
-├── fonts/                       # Space Grotesk + DM Sans
-├── docs/                        # Setup, customization, architecture
-└── examples/                    # Sample CV, report, proof points
+```text
+career-ops-lifesci/
+|-- AGENTS.md
+|-- CLAUDE.md
+|-- config/profile.example.yml
+|-- modes/
+|-- templates/
+|-- batch/
+|-- dashboard/
+|-- docs/
+|-- examples/
+|-- data/
+|-- reports/
+|-- output/
 ```
 
-## Tech Stack
+## Documentation
 
-![Claude Code](https://img.shields.io/badge/Claude_Code-000?style=flat&logo=anthropic&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
-![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat&logo=playwright&logoColor=white)
-![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)
-![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
-
-- **Agent**: Claude Code with custom skills and modes
-- **PDF**: Playwright/Puppeteer + HTML template
-- **Scanner**: Playwright + Greenhouse API + WebSearch
-- **Dashboard**: Go + Bubble Tea + Lipgloss (Catppuccin Mocha theme)
-- **Data**: Markdown tables + YAML config + TSV batch files
-
-## Also Open Source
-
-- **[cv-santiago](https://github.com/santifer/cv-santiago)** -- The portfolio website (santifer.io) with AI chatbot, LLMOps dashboard, and case studies. If you need a portfolio to showcase alongside your job search, fork it and make it yours.
-
-## About the Author
-
-I'm Santiago -- Head of Applied AI, former founder (built and sold a business that still runs with my name on it). I built career-ops to manage my own job search. It worked: I used it to land my current role.
-
-My portfolio and other open source projects → [santifer.io](https://santifer.io)
-
-☕ [Buy me a coffee](https://buymeacoffee.com/santifer) if career-ops helped your job search.
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=santifer%2Fcareer-ops&type=timeline&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=santifer/career-ops&type=timeline&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=santifer/career-ops&type=timeline&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=santifer/career-ops&type=timeline&legend=top-left" />
- </picture>
-</a>
+- [docs/SETUP.md](docs/SETUP.md)
+- [docs/CUSTOMIZATION.md](docs/CUSTOMIZATION.md)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [LEGAL_DISCLAIMER.md](LEGAL_DISCLAIMER.md)
 
 ## Disclaimer
 
-**career-ops is a local, open-source tool — NOT a hosted service.** By using this software, you acknowledge:
+Career-Ops LifeSci is a local, open-source tool, not a hosted service. You control your data, your prompts, your providers, and your outputs. Always review generated material for accuracy and fit before using it in the real world.
 
-1. **You control your data.** Your CV, contact info, and personal data stay on your machine and are sent directly to the AI provider you choose (Anthropic, OpenAI, etc.). We do not collect, store, or have access to any of your data.
-2. **You control the AI.** The default prompts instruct the AI not to auto-submit applications, but AI models can behave unpredictably. If you modify the prompts or use different models, you do so at your own risk. **Always review AI-generated content for accuracy before submitting.**
-3. **You comply with third-party ToS.** You must use this tool in accordance with the Terms of Service of the career portals you interact with (Greenhouse, Lever, Workday, LinkedIn, etc.). Do not use this tool to spam employers or overwhelm ATS systems.
-4. **No guarantees.** Evaluations are recommendations, not truth. AI models may hallucinate skills or experience. The authors are not liable for employment outcomes, rejected applications, account restrictions, or any other consequences.
-
-See [LEGAL_DISCLAIMER.md](LEGAL_DISCLAIMER.md) for full details. This software is provided under the [MIT License](LICENSE) "as is", without warranty of any kind.
+See [LEGAL_DISCLAIMER.md](LEGAL_DISCLAIMER.md) for full details.
 
 ## License
 
-MIT
-
-## Let's Connect
-
-[![Website](https://img.shields.io/badge/santifer.io-000?style=for-the-badge&logo=safari&logoColor=white)](https://santifer.io)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/santifer)
-[![X](https://img.shields.io/badge/X-000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/santifer)
-[![Email](https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:hi@santifer.io)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/santifer)
+Released under the [MIT License](LICENSE).

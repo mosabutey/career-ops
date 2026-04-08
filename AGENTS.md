@@ -18,7 +18,7 @@ There are two layers. Read `DATA_CONTRACT.md` for the full list.
 
 **System Layer (auto-updatable, DON'T put user data here):**
 - `modes/_shared.md`, `modes/evaluate.md`, all other modes
-- `CLAUDE.md`, `*.mjs` scripts, `dashboard/*`, `templates/*`, `batch/*`
+- `AGENTS.md`, `*.mjs` scripts, `dashboard/*`, `templates/*`, `batch/*`
 
 **THE RULE: When the user asks to customize anything personal (role packs, narrative, negotiation scripts, proof points, location policy, comp targets), ALWAYS write to `modes/_profile.md` or `config/profile.yml`. NEVER edit `modes/_shared.md` for user-specific content.** This ensures system updates don't overwrite their customizations.
 
@@ -43,7 +43,7 @@ To rollback: `node update-system.mjs rollback`
 
 ## What is Career-Ops LifeSci
 
-Local-first career intelligence built on Claude Code: opportunity evaluation, role-pack-aware CV generation, portal scanning, batch processing, and pipeline tracking.
+Local-first career intelligence built on Codex: opportunity evaluation, role-pack-aware CV generation, portal scanning, batch processing, and pipeline tracking.
 
 ### Main Files
 
@@ -64,7 +64,7 @@ Local-first career intelligence built on Claude Code: opportunity evaluation, ro
 
 When using [OpenCode](https://opencode.ai), the following slash commands are available (defined in `.opencode/commands/`):
 
-| Command | Claude Code Equivalent | Description |
+| Command | Codex Equivalent | Description |
 |---------|------------------------|-------------|
 | `/career-ops` | `/career-ops` | Show menu or evaluate JD with args |
 | `/career-ops-pipeline` | `/career-ops pipeline` | Process pending URLs from inbox |
@@ -80,7 +80,7 @@ When using [OpenCode](https://opencode.ai), the following slash commands are ava
 | `/career-ops-scan` | `/career-ops scan` | Scan portals for new offers |
 | `/career-ops-batch` | `/career-ops batch` | Batch processing with parallel workers |
 
-**Note:** OpenCode commands invoke the same `.claude/skills/career-ops/SKILL.md` skill used by Claude Code. The `modes/*` files are shared between both platforms.
+**Note:** OpenCode commands invoke the same `.Codex/skills/career-ops/SKILL.md` skill used by Codex. The `modes/*` files are shared between both platforms.
 
 ### First Run — Onboarding (IMPORTANT)
 
@@ -244,7 +244,7 @@ Default modes are in `modes/` (English). Additional language-specific modes are 
 2. `browser_snapshot` to read content
 3. Only footer/navbar without JD = closed. Title + description + Apply = active.
 
-**Exception for batch workers (`claude -p`):** Playwright is not available in headless pipe mode. Use WebFetch as fallback and mark the report header with `**Verification:** unconfirmed (batch mode)`. The user can verify manually later.
+**Exception for batch workers (`Codex -p`):** Playwright is not available in headless pipe mode. Use WebFetch as fallback and mark the report header with `**Verification:** unconfirmed (batch mode)`. The user can verify manually later.
 
 ---
 

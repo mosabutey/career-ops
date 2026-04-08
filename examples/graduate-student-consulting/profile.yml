@@ -1,0 +1,30 @@
+candidate:
+  full_name: "Riley Morgan"
+  background_type: "Graduate student"
+  training_stage: "student_early"
+  work_authorization: "F-1 student using CPT for internships; future sponsorship likely required for long-term U.S. work"
+
+authorization:
+  country: "United States"
+  current_status: "F-1"
+  can_work_now: true
+  requires_immediate_sponsorship: false
+  future_sponsorship_required: true
+  authorization_basis: "CPT for internships, then OPT after graduation"
+  authorization_end_date: "2028-05"
+  sponsorship_policy:
+    default_when_unstated: "apply"
+
+career_strategy:
+  primary_tracks:
+    - "life_sciences_consulting"
+  secondary_tracks:
+    - "adjacent_generalist"
+
+role_packs:
+  life_sciences_consulting:
+    enabled: true
+    target_roles:
+      - "Life Sciences Consulting Intern"
+      - "Healthcare Strategy Intern"
+      - "Associate Consultant"

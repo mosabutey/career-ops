@@ -29,29 +29,40 @@ const RELEASES_API = 'https://api.github.com/repos/santifer/career-ops/releases/
 
 // System layer paths — ONLY these files get updated
 const SYSTEM_PATHS = [
+  'AGENTS.md',
   'modes/_shared.md',
   'modes/_profile.template.md',
+  'modes/evaluate.md',
   'modes/oferta.md',
   'modes/pdf.md',
   'modes/scan.md',
   'modes/batch.md',
   'modes/apply.md',
   'modes/auto-pipeline.md',
+  'modes/contact.md',
   'modes/contacto.md',
   'modes/deep.md',
+  'modes/compare.md',
   'modes/ofertas.md',
   'modes/pipeline.md',
   'modes/project.md',
   'modes/tracker.md',
   'modes/training.md',
+  'modes/interview-prep.md',
   'modes/de/',
+  'modes/fr/',
+  'modes/pt/',
   'CLAUDE.md',
+  'doctor.mjs',
+  'check-liveness.mjs',
   'generate-pdf.mjs',
   'merge-tracker.mjs',
   'verify-pipeline.mjs',
   'dedup-tracker.mjs',
   'normalize-statuses.mjs',
+  'tracker-contract.mjs',
   'cv-sync-check.mjs',
+  'test-all.mjs',
   'update-system.mjs',
   'batch/batch-prompt.md',
   'batch/batch-runner.sh',
@@ -59,6 +70,8 @@ const SYSTEM_PATHS = [
   'templates/',
   'fonts/',
   '.claude/skills/',
+  '.agents/skills/',
+  '.opencode/commands/',
   'docs/',
   'VERSION',
   'DATA_CONTRACT.md',
@@ -101,6 +114,16 @@ function compareVersions(a, b) {
 
 function git(cmd) {
   return execSync(`git ${cmd}`, { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }).trim();
+}
+
+function stagePaths(paths) {
+  for (const path of paths) {
+    try {
+      git(`add -- "${path}"`);
+    } catch {
+      // Path may not exist locally or upstream.
+    }
+  }
 }
 
 // ── CHECK ───────────────────────────────────────────────────────
@@ -224,18 +247,24 @@ async function apply() {
       console.log('npm install skipped (may need manual run)');
     }
 
-    // 6. Commit the update
+    // 6. Clean up dismiss flag if it exists
+    const dismissFile = join(ROOT, '.update-dismissed');
+    if (existsSync(dismissFile)) unlinkSync(dismissFile);
+
+    stagePaths(SYSTEM_PATHS);
+    try {
+      git('add -u -- ".update-dismissed"');
+    } catch {
+      // No dismiss flag changes to stage.
+    }
+
+    // 7. Commit the update
     const remote = localVersion(); // Re-read after checkout updated VERSION
     try {
-      git('add .');
       git(`commit -m "chore: auto-update system files to v${remote}"`);
     } catch {
       // Nothing to commit (already up to date)
     }
-
-    // 7. Clean up dismiss flag if it exists
-    const dismissFile = join(ROOT, '.update-dismissed');
-    if (existsSync(dismissFile)) unlinkSync(dismissFile);
 
     console.log(`\nUpdate complete: v${local} → v${remote}`);
     console.log(`Updated ${updated.length} system paths.`);
@@ -274,7 +303,7 @@ function rollback() {
       }
     }
 
-    git('add .');
+    stagePaths(SYSTEM_PATHS);
     git(`commit -m "chore: rollback system files from ${latest}"`);
 
     console.log(`Rollback complete. System files restored from ${latest}.`);

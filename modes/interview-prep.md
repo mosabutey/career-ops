@@ -5,7 +5,7 @@ When the user asks to prep for an interview at a specific company+role, or when 
 ## Inputs
 
 1. **Company name** and **role title** (required)
-2. **Evaluation report** in `reports/` (if exists) — read for archetype, gaps, matched proof points
+2. **Evaluation report** in `reports/` (if exists) — read for track, career stage, gaps, matched proof points
 3. **Story bank** at `interview-prep/story-bank.md` — read for existing prepared stories
 4. **CV** at `cv.md` + `article-digest.md` — read for proof points
 5. **Profile** at `config/profile.yml` + `modes/_profile.md` — read for candidate context
@@ -22,7 +22,7 @@ Run these WebSearch queries. Extract structured data, not summaries. Cite source
 | `"{company} engineering blog"` | Tech stack, values, what they publish about, technical priorities |
 | `"{company} interview process {role}"` (general) | Fills gaps from above — blog posts, YouTube, prep guides, candidate write-ups |
 
-If the company is small or obscure and yields few results, broaden: search for the role archetype at similar-stage companies, and note that intel is sparse.
+If the company is small or obscure and yields few results, broaden: search for the role pack at similar-stage companies, and note that intel is sparse.
 
 **Do NOT fabricate questions.** If a source says "they asked about distributed systems," report that. Do not invent a specific distributed systems question. When generating likely questions from JD analysis, label them clearly as `[inferred from JD]` not sourced from candidates.
 
@@ -70,7 +70,7 @@ Questions about leadership, conflict, collaboration, failure.
 For each: the question, source, and which story from `story-bank.md` maps best.
 
 ### Role-Specific
-Questions tied to the specific job description (archetype-aware).
+Questions tied to the specific job description (track-aware).
 For each: the question, why they're likely asking it (what JD requirement it maps to), and the candidate's best angle.
 
 ### Background Red Flags

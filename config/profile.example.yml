@@ -1,71 +1,216 @@
-# Career-Ops Profile Configuration
+# Career-Ops LifeSci Profile Configuration
 # Copy this file to config/profile.yml and fill in your details.
-# This is the single source of truth for your personal data across all modes.
+# This file is the single source of truth for your identity, goals, constraints,
+# role packs, and stage-specific strategy.
 
 candidate:
-  full_name: "Jane Smith"
-  email: "jane@example.com"
+  full_name: "Dr. Avery Chen"
+  email: "avery@example.com"
   phone: "+1-555-0123"
-  location: "San Francisco, CA"
-  linkedin: "linkedin.com/in/janesmith"
-  portfolio_url: "https://janesmith.dev"
-  github: "github.com/janesmith"
-  twitter: "https://x.com/janesmith"
-  # (Optional) Canva resume design ID for visual CV generation via /career-ops pdf.
-  # Find it in your Canva design URL: https://www.canva.com/design/DAxxxxxxx/...
-  # The ID starts with "D" and is 11 characters long.
+  location: "Boston, MA"
+  country: "United States"
+  timezone: "America/New_York"
+  linkedin: "https://linkedin.com/in/averychen"
+  portfolio_url: "https://averychen.me"
+  github: "https://github.com/averychen"
+  background_type: "PhD scientist"
+  training_stage: "advanced_training"   # student_early | advanced_training | experienced_professional
+  current_identity: "Cancer biology PhD candidate with translational research and cross-functional communication strength"
+  work_authorization: "F-1 STEM OPT through 2028; future sponsorship required for long-term U.S. employment"
+  # Optional Canva design ID for visual CV generation via /career-ops pdf
   # canva_resume_design_id: "DAxxxxxxxxx"
 
-target_roles:
-  # Your North Star roles — what you're optimizing for
-  primary:
-    - "Senior AI Engineer"
-    - "Staff ML Engineer"
-  # Archetypes help the evaluation system score fit
-  archetypes:
-    - name: "AI/ML Engineer"
-      level: "Senior/Staff"
-      fit: "primary"        # primary = dream role, secondary = good fit, adjacent = stretch
-    - name: "AI Product Manager"
-      level: "Senior"
-      fit: "secondary"
-    - name: "Solutions Architect"
-      level: "Mid-Senior"
-      fit: "adjacent"
+authorization:
+  country: "United States"
+  current_status: "F-1"
+  can_work_now: true
+  requires_immediate_sponsorship: false
+  future_sponsorship_required: true
+  authorization_basis: "STEM OPT"
+  authorization_end_date: "2028-07"
+  target_intent: "I want to remain in the U.S. long term."
+  sponsorship_policy:
+    default_when_unstated: "apply"
+    explicit_no_sponsorship: "treat as strong negative signal"
+    explicit_open_to_sponsorship: "treat as positive signal"
+    citizenship_or_clearance_requirement: "treat as likely blocker unless independently satisfied"
+  employer_constraints:
+    - "Do not claim I am sponsorship-free if I will need sponsorship later."
+    - "Call out explicit no-sponsorship language in job postings."
+    - "If the posting is silent, do not auto-skip on sponsorship grounds alone."
+  answer_templates:
+    work_authorized_now: "I am currently authorized to work in the United States under STEM OPT."
+    future_sponsorship: "I do not require immediate sponsorship, but I will require employer sponsorship in the future to continue long-term U.S. employment."
+    additional_context: "There is no employer cost or action required for my current authorization period."
+
+career_strategy:
+  north_star: "Build a durable, opportunity-rich career across scientific, clinical, and technical industries."
+  stage_path: "advanced_training"
+  primary_tracks:
+    - "biopharma_medical"
+    - "life_sciences_consulting"
+    - "healthtech_scientific"
+  secondary_tracks:
+    - "adjacent_generalist"
+  target_markets:
+    - "United States"
+    - "Remote-friendly"
+  target_work_models:
+    - "Remote"
+    - "Hybrid"
+  transition_priorities:
+    - "Land interviews in high-fit roles"
+    - "Translate research experience into employer language"
+    - "Maintain optionality across multiple role families"
+
+role_packs:
+  biopharma_medical:
+    enabled: true
+    fit: "primary"
+    target_roles:
+      - "Medical Science Liaison"
+      - "Medical Affairs Manager"
+      - "Scientific Affairs Manager"
+      - "Clinical Scientist"
+      - "Translational Science Lead"
+    company_priority:
+      - "Genentech"
+      - "Novartis"
+      - "Johnson & Johnson"
+    therapeutic_areas:
+      - "Oncology"
+      - "Neuroscience"
+      - "Immunology"
+    evidence_themes:
+      - "Scientific communication"
+      - "Clinical or translational judgment"
+      - "External-facing credibility"
+      - "Evidence interpretation"
+    compensation:
+      currency: "USD"
+      target_range: "$160K-$220K"
+      floor: "$140K"
+
+  life_sciences_consulting:
+    enabled: true
+    fit: "primary"
+    target_roles:
+      - "Life Sciences Consultant"
+      - "Healthcare Strategy Associate"
+      - "Due Diligence Consultant"
+      - "Scientific Advisor"
+    company_priority:
+      - "BCG"
+      - "PwC"
+      - "ClearView"
+    focus_areas:
+      - "Market strategy"
+      - "Commercial due diligence"
+      - "Portfolio strategy"
+    evidence_themes:
+      - "Problem structuring"
+      - "Executive communication"
+      - "Scientific synthesis"
+      - "Decision support"
+    compensation:
+      currency: "USD"
+      target_range: "$150K-$210K"
+      floor: "$130K"
+
+  healthtech_scientific:
+    enabled: true
+    fit: "secondary"
+    target_roles:
+      - "Clinical Strategy Manager"
+      - "Scientific Product Manager"
+      - "Medical Content Lead"
+      - "Solutions Consultant"
+    company_priority:
+      - "Tempus"
+      - "Flatiron Health"
+      - "OpenEvidence"
+    focus_areas:
+      - "Clinical workflow"
+      - "Evidence-to-product translation"
+      - "Stakeholder education"
+    evidence_themes:
+      - "Systems thinking"
+      - "Scientific credibility"
+      - "Product or operations empathy"
+    compensation:
+      currency: "USD"
+      target_range: "$140K-$200K"
+      floor: "$120K"
+
+  adjacent_generalist:
+    enabled: true
+    fit: "adjacent"
+    target_roles:
+      - "Chief of Staff"
+      - "Program Strategy Manager"
+      - "Scientific Operations Lead"
+    evidence_themes:
+      - "Leadership"
+      - "Cross-functional execution"
+      - "Communication under ambiguity"
 
 narrative:
-  # Your professional headline (1 line)
-  headline: "ML Engineer turned AI product builder"
-  # Your exit story — what makes you unique
-  exit_story: "Built and sold my SaaS after 5 years. Now focused on applied AI at scale."
-  # Your top 3-5 superpowers
+  headline: "Scientist-operator translating complex evidence into decisions, strategy, and action."
+  transition_story: "I turn deep domain work into decision-ready outputs for clinical, commercial, and technical teams."
   superpowers:
-    - "End-to-end ML pipelines"
-    - "Fast prototyping (idea to prod in 2 weeks)"
-    - "Cross-functional communication"
-  # Proof points — projects, articles, case studies with measurable impact
-  proof_points:
-    - name: "Project Alpha"
-      url: "https://janesmith.dev/project-alpha"
-      hero_metric: "Reduced inference latency 40%"
-    - name: "Open Source Tool"
-      url: "https://github.com/janesmith/tool"
-      hero_metric: "2K+ GitHub stars"
-  # Optional: dashboard/demo URL with credentials
-  # dashboard:
-  #   url: "https://janesmith.dev/demo"
-  #   password: "demo-2026"
+    - "Turning complex scientific material into clear narratives"
+    - "Pattern recognition across research, operations, and stakeholder needs"
+    - "Structured problem solving under ambiguity"
+  hidden_assets:
+    - "Teaching and mentoring experience that signals communication range"
+    - "Protocol, operations, or study execution work that signals delivery"
+    - "Cross-disciplinary collaboration that signals stakeholder management"
+  stakeholder_strengths:
+    - "Communicates with clinicians, scientists, operators, and business stakeholders"
+    - "Presents nuanced evidence without oversimplifying"
+  objections_to_reframe:
+    - "Too academic"
+    - "Not enough direct industry experience"
+    - "Broad background may look unfocused"
 
-compensation:
-  target_range: "$150K-200K"     # Your target total comp
-  currency: "USD"
-  minimum: "$120K"               # Walk-away number
-  location_flexibility: "Remote preferred, 1 week/month on-site possible"
+deal_breakers:
+  hard:
+    - "Auto-submitting applications"
+    - "Roles with no plausible learning or growth path"
+    - "Misleading claims about experience"
+  soft:
+    - "Heavy travel"
+    - "Fully on-site without clear upside"
+    - "Comp far below market"
 
-location:
-  country: "United States"
-  city: "San Francisco"
-  timezone: "PST"
-  visa_status: "No sponsorship needed"
-  # For remote roles outside your country:
-  # onsite_availability: "1 week/month in any city"
+evidence_assets:
+  fact_sources:
+    cv: "cv.md"
+    profile_notes: "modes/_profile.md"
+    proof_bank: "article-digest.md"
+  categories:
+    - "Education"
+    - "Research"
+    - "Clinical"
+    - "Operations"
+    - "Teaching"
+    - "Leadership"
+    - "Publications"
+    - "Awards"
+    - "Projects"
+
+document_strategy:
+  default_variants:
+    - "medical_affairs_resume"
+    - "consulting_resume"
+    - "healthtech_resume"
+    - "short_industry_cv"
+  optional_variants:
+    - "internship_resume"
+    - "externship_resume"
+    - "academic_support_cv"
+
+language:
+  modes_dir: "modes"
+  document_language: "en"
+  outreach_language: "en"
