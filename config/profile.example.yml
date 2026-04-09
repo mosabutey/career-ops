@@ -82,8 +82,33 @@ application_defaults:
   company_specific_defaults:
     current_or_former_employee: false
     current_or_former_contractor: false
+    interviewed_with_employer_before: false
     employee_referral_name: ""
     notice_period: ""
+  # Optional Phenom / Phenom People defaults for visible review handoff automation.
+  # These stay local in config/profile.yml and help the agent reach a real review page
+  # while still stopping before final submission.
+  phenom_defaults:
+    how_did_you_hear: "Company careers page"
+    previous_worker: false
+    interviewed_with_employer_before: false
+    base_salary_expectations: "Open to discussing compensation within the posted range based on level, scope, and total package."
+  phenom_education:
+    entry_1:
+      school_name: "Example University"
+      degree_label: "Doctor of Philosophy (Ph.D)"
+      field_of_study_label: "Immunology"
+      end_year: "2028"
+    entry_2:
+      school_name: "Example University"
+      degree_label: "Master of Science (M.S)"
+      field_of_study_label: "Biomedical Science"
+      end_year: "2024"
+    entry_3:
+      school_name: "Example College"
+      degree_label: "Bachelor of Science (B.S)"
+      field_of_study_label: "Biology"
+      end_year: "2020"
   # Optional Workday-specific overrides for employers whose source picker wording differs.
   # Keep these local-only in config/profile.yml.
   workday_overrides:

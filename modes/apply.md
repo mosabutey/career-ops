@@ -7,6 +7,7 @@ This mode can be used for browser-assisted application work on the candidate's l
 ## Requirements
 
 - **Best with visible Playwright**: in visible mode, the candidate can see the browser and the agent can interact with the page.
+- **Best end-state is a visible review handoff**: if browser control is available, prefer leaving the live ATS browser open on `Review` so the candidate can inspect the real form directly.
 - **Without Playwright**: the candidate shares a screenshot or pastes the questions manually.
 - **File uploads**: if the candidate wants the agent to upload a resume or cover letter, the file path must be known and the intended document should be confirmed first.
 - **Custom ATS widgets**: many live forms use custom comboboxes, listboxes, step flows, and gated account-creation screens instead of plain HTML inputs. Treat those as first-class application controls.
@@ -34,6 +35,7 @@ If the candidate asks for it and browser control is available, the agent may:
 - inspect visible fields and upload controls
 - inspect the control model for custom widgets such as comboboxes, listboxes, radios, checkboxes, and multi-step flows
 - prepare the browser state for the candidate's review
+- preserve a persistent browser session and hand off the live `Review` page when possible
 
 **Without Playwright:** ask the candidate to:
 - Share a screenshot of the form
@@ -149,6 +151,8 @@ For uploads and form-filling:
 - if a sign-in modal overlays the create-account page, scope selectors to the modal because background create-account inputs may still be visible and can steal focus or fills
 - do not invent required information the candidate has not approved
 - stop before the final submit or send action so the candidate can review everything
+- when review is reached in a visible browser session, prefer leaving that live page open rather than closing the browser and relying only on screenshots
+- if a visible review handoff is not possible, save the last URL, active step, uploads used, and unresolved fields so the candidate can recover through a persistent session or the ATS's own saved-draft flow later
 
 **Output format:**
 

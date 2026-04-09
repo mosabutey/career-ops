@@ -9,8 +9,63 @@ Application platforms do not behave the same way:
 - some use custom combobox and listbox widgets
 - some gate the real application behind account creation
 - some rename the call to action so it is not literally `Apply`
+- some are good candidates for a direct visible-browser review handoff, while others require stronger recovery strategies
 
 Treating all ATS platforms the same leads to brittle browser automation. This playbook keeps `apply` mode practical and platform-aware.
+
+## Cross-platform review access strategy
+
+Preferred order:
+1. visible review handoff in a persistent browser session
+2. persistent-session recovery with last known step and URL
+3. ATS saved-draft or returning-applicant recovery
+
+Why this matters:
+- a screenshot proves what was reached, but a live browser handoff lets the candidate inspect and edit the real form directly
+- persistent session recovery can preserve progress when the browser cannot stay open
+- ATS-native draft recovery is the last resilient fallback when browser state is lost
+
+For the full operational playbook, see [docs/APPLY_REVIEW_HANDOFF.md](APPLY_REVIEW_HANDOFF.md).
+
+## Phenom / Phenom People
+
+### Proven live behavior
+
+- multi-step same-tab application flow is reachable from the public job page
+- native `select`, text input, textarea, checkbox, and radio controls are used heavily
+- uploading a resume on step 1 can prefill later work-experience sections
+- a real `Review` page can be reached without creating an employer-specific account
+
+### Representative findings
+
+- Eisai's current Phenom flow exposed:
+  - `My information`
+  - `My experience`
+  - `Application questions`
+  - `Voluntary Disclosures`
+  - `Self identity`
+  - `Review`
+- resume upload prefilled the three work-experience entries, but education degree and field selectors still required manual or profile-driven completion
+- the salary question was a textarea, not a dropdown
+- the final review page showed a true summary plus a visible `Submit` button
+
+### Best strategy
+
+1. prefer a visible browser session, not a disposable hidden run
+2. upload the approved resume early because it can prefill work history
+3. fill the standardized identity fields from `config/profile.yml`
+4. store Phenom-specific education and job-question defaults locally when repeated use matters
+5. if review is reached, keep the browser open for direct candidate handoff
+6. tell the candidate to use the review page's `Edit` links rather than browser Back or the step sidebar
+7. auto-focus the review page intentionally:
+   - default to the `Submit` region so the final state is obvious
+   - use an `edit`-focused handoff when the candidate wants to inspect every section first
+8. remind the candidate that `Next`, `Save and Continue`, and `Submit` are usually bottom-of-page controls, not sticky controls
+9. if review is not reached, save the last step, URL, missing fields, and session directory for recovery
+
+### Known risk
+
+Phenom can parse resume data unevenly across sections. Work history may import cleanly while education, salary, or employer-specific screening answers still require local defaults or manual review.
 
 ## Greenhouse
 

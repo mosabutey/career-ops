@@ -45,6 +45,9 @@ That section should cover, truthfully:
 - voluntary disclosure defaults you want available locally, such as veteran status, disability status, gender, race/ethnicity, and Hispanic/Latino responses
 - whether the agent may pre-check required consent/attestation boxes before your review
 - approved upload-file paths in `application_files`, especially your default resume path and any optional cover letter or transcript path
+- any ATS-specific fields you want available for visible review handoff helpers, such as:
+  - `application_defaults.phenom_defaults.*`
+  - `application_defaults.phenom_education.*`
 
 These values stay local in `config/profile.yml`; they are not meant for the public repo.
 
@@ -97,9 +100,18 @@ When the repo is open in a compatible local agent environment, the agent can:
 
 The user remains the final reviewer and submitter of all real applications.
 
+If you want the strongest browser-assisted apply experience, prefer a visible review handoff workflow rather than a disposable headless run. For Phenom / Phenom People employers, the repo now includes:
+
+```bash
+npm run apply:phenom-review -- --url="https://careers.example.com/.../apply?jobSeqNo=..."
+```
+
+That helper uses a persistent local browser profile, fills known fields from `config/profile.yml`, and keeps the live browser open when it reaches `Review` so you can inspect the real application directly.
+
 For boundaries and operating expectations, see [docs/LOCAL_AGENT_GUIDE.md](LOCAL_AGENT_GUIDE.md).
 For real-site validation of browser assistance, see [docs/BROWSER_APPLY_CHECKLIST.md](BROWSER_APPLY_CHECKLIST.md).
 For ATS-specific application behavior, see [docs/ATS_APPLY_PLAYBOOK.md](ATS_APPLY_PLAYBOOK.md).
+For visible review handoff and recovery paths, see [docs/APPLY_REVIEW_HANDOFF.md](APPLY_REVIEW_HANDOFF.md).
 
 ## Validate setup
 

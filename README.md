@@ -210,6 +210,7 @@ When browser automation is available, the system can:
 - generate tailored responses from prior reports
 - upload the correct resume or cover letter when the file path is known
 - fill sections of the form for human review
+- leave a visible browser open on the live `Review` page when the platform supports a direct handoff workflow
 
 To keep that flow smooth, users should front-load their local-only application profile:
 - legal/contact details used in job portals
@@ -228,6 +229,12 @@ The human boundary stays in place:
 Repeat-company note:
 - some Workday employers remember prior applicant state, may skip parts of account setup on later applications, and may offer accelerators such as `Use My Last Application` or resume-driven autofill
 - treat those as speed features, not proof that the imported information is correct; agents should still verify every carried-forward field before the final review
+
+Best-practice handoff note:
+- when possible, prefer a visible browser handoff over a disposable headless run so the candidate can directly inspect the live ATS review page instead of relying only on screenshots
+- for Phenom / Phenom People employers, use `npm run apply:phenom-review -- --url="https://careers.example.com/.../apply?jobSeqNo=..."` to drive a visible review handoff from local profile data
+- if a live review handoff is not possible, preserve a persistent session and rely on ATS saved-draft or returning-applicant recovery paths instead of starting over blindly
+- see [docs/APPLY_REVIEW_HANDOFF.md](docs/APPLY_REVIEW_HANDOFF.md) for the full handoff and recovery playbook
 
 ## What Agents Can Do Locally On Your PC
 

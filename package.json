@@ -11,6 +11,7 @@
     "patterns": "node analyze-patterns.mjs",
     "pdf": "node generate-pdf.mjs",
     "probe:apply": "node probe-apply-flow.mjs",
+    "apply:phenom-review": "node assist-phenom-review-handoff.mjs",
     "probe:workday-auth": "node probe-workday-auth.mjs",
     "probe:workday-picker": "node probe-workday-picker-options.mjs",
     "probe:workday-myinfo": "node probe-workday-myinfo.mjs",

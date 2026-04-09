@@ -71,6 +71,7 @@ When browser automation is available, a well-configured local agent may:
 - choose the best-fit document variant
 - upload that document
 - fill visible fields from approved source material
+- keep a visible browser open at the live `Review` page when a supported handoff workflow is used
 
 The more complete the local profile is, the less often the agent has to stop mid-portal to ask for missing data.
 
@@ -78,7 +79,15 @@ On repeat applications to the same employer, some Workday tenants may reuse prio
 
 The agent should then stop and present the application for review before final submission.
 
+Best-practice order for review access:
+1. visible browser handoff at `Review`
+2. persistent session recovery
+3. ATS saved-draft or returning-applicant recovery
+
+For Phenom / Phenom People employers, the repo now includes `assist-phenom-review-handoff.mjs`, which uses a persistent local browser profile and leaves the live browser open by default so the candidate can inspect the real review page directly.
+
 For platform-specific browser guidance, see [docs/ATS_APPLY_PLAYBOOK.md](ATS_APPLY_PLAYBOOK.md).
+For handoff and recovery guidance, see [docs/APPLY_REVIEW_HANDOFF.md](APPLY_REVIEW_HANDOFF.md).
 
 ## Practical limits
 

@@ -26,6 +26,7 @@ This document records hands-on validation findings from real public application 
 | 2026-04-09 | Ashby | CoMind -- Director of Medical Affairs | live form | `Apply for this job` opened `/application` and exposed text fields, uploads, a sponsorship radio question, and a combobox | `comind-ashby-director-medical-affairs-2026-04-08.json`, `comind-ashby-director-medical-affairs-2026-04-08-initial.png`, `comind-ashby-director-medical-affairs-2026-04-08-after-cta.png` |
 | 2026-04-09 | iCIMS | Medpace -- Clinical Safety Manager - Pharmacovigilance / Drug Safety | login gate | `Apply` left the social-distribution posting and opened an employer `icims.com` login route instead of an inspectable application form | `medpace-icims-clinical-safety-manager-2026-04-08.json`, `medpace-icims-clinical-safety-manager-2026-04-08-initial.png`, `medpace-icims-clinical-safety-manager-2026-04-08-after-cta.png` |
 | 2026-04-09 | Workable | CLAS -- Medical Interpreter | live form after cookie handling | cookie banner blocked the CTA until dismissed; then `Apply for this job` opened `/apply/` with large questionnaire, uploads, textareas, radios, and one combobox | `clas-workable-medical-interpreter-2026-04-08.json`, `clas-workable-medical-interpreter-2026-04-08-initial.png`, `clas-workable-medical-interpreter-2026-04-08-after-cta.png` |
+| 2026-04-09 | Phenom | Eisai -- MSL/Sr. MSL, Neurology - Alzheimer's Disease, New England | review reached without submission | a truthful fill pass uploaded the tailored resume, advanced through personal information, work and education, job-specific questions, veteran disclosure, disability self-ID, and reached a real `Review` page with a visible `Submit` button | `eisai-r3995-apply-2026-04-09.json`, `eisai-review-2026-04-09.json`, `eisai-review-2026-04-09.png` |
 
 ## Validated platforms
 
@@ -197,6 +198,26 @@ Observed:
 Important finding:
 - Workable may require cookie-banner handling before the visible CTA is actually usable
 - Workable can expose large, same-tab application forms with many required upload and questionnaire sections
+
+### Phenom / Phenom People
+
+Representative live test:
+- Eisai -- MSL/Sr. MSL, Neurology - Alzheimer's Disease, New England
+
+Observed:
+- the employer route exposed a same-tab multi-step apply flow
+- step 1 used native `select` and text controls for personal information
+- resume upload on step 1 was accepted and persisted into review
+- step 2 prefilled work experience from the uploaded resume
+- step 2 still required manual or profile-driven completion of degree and field-of-study selectors for education
+- step 3 used native `select` controls plus a textarea for salary expectations
+- step 4 required veteran-status selection plus a terms-and-conditions checkbox
+- step 5 rendered the federal disability self-ID form and still allowed truthful `I do not want to answer`
+- step 6 rendered a true `Review` page with summary sections and a visible final `Submit` button
+
+Important finding:
+- Phenom is a strong candidate for visible-browser review handoff because the final review page is directly reachable without an employer-side account gate on the tested flow
+- resume parsing can reduce manual effort substantially, but it should not be trusted to complete education or employer-specific questions without verification
 
 ## Failure cases observed
 

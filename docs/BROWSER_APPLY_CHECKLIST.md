@@ -74,6 +74,8 @@ For repeatable evidence capture, you can also run `npm run probe:apply -- --plat
 - The agent stops before final submit
 - The final review remains with the user
 - No attempt is made to bypass captcha, login friction, or platform safeguards
+- When possible, the user receives a live browser handoff at `Review`, not only screenshots
+- If a live handoff is not possible, the last URL, step, uploaded files, and unresolved fields are captured for recovery
 
 ### 7. Broken or stale links
 
