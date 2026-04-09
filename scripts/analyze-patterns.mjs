@@ -4,36 +4,41 @@
  * analyze-patterns.mjs
  *
  * Read tracker and report data to surface signal about:
- * - score distribution
- * - status conversion
- * - role-pack and stage concentration
+ * - conversion funnel and score quality
+ * - role-pack and career-stage concentration
  * - sponsorship / authorization friction
- * - strongest and weakest application patterns
+ * - blocker patterns from report gaps
+ * - where strong-fit roles are not converting
  *
  * Usage:
  *   node scripts/analyze-patterns.mjs
  *   node scripts/analyze-patterns.mjs --json
  *   node scripts/analyze-patterns.mjs --write
- *   node scripts/analyze-patterns.mjs --out reports/patterns-2026-04-08.md
+ *   node scripts/analyze-patterns.mjs --out reports/pattern-analysis-2026-04-09.md
+ *   node scripts/analyze-patterns.mjs --min-threshold 5
  */
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
-import { normalizeStatusLabel } from './tracker-contract.mjs';
+import { normalizeStatusId, normalizeStatusLabel } from './tracker-contract.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const args = new Set(process.argv.slice(2));
-const wantsJson = args.has('--json');
-const wantsWrite = args.has('--write');
-const outIndex = process.argv.indexOf('--out');
-const explicitOut = outIndex >= 0 ? process.argv[outIndex + 1] : null;
+const args = process.argv.slice(2);
+const argSet = new Set(args);
+
+const wantsJson = argSet.has('--json');
+const wantsWrite = argSet.has('--write');
+const outIndex = args.indexOf('--out');
+const thresholdIndex = args.indexOf('--min-threshold');
+const explicitOut = outIndex >= 0 ? args[outIndex + 1] : null;
+const minThreshold = thresholdIndex >= 0 ? Number(args[thresholdIndex + 1]) || 5 : 5;
 
 const applicationsPath = join(ROOT, 'data', 'applications.md');
 const reportsDir = join(ROOT, 'reports');
 const outPath = explicitOut
   ? join(ROOT, explicitOut)
-  : join(ROOT, 'reports', `patterns-${today()}.md`);
+  : join(ROOT, 'reports', `pattern-analysis-${today()}.md`);
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -44,19 +49,23 @@ function safeRead(path) {
 }
 
 function parseScore(raw) {
-  const match = String(raw).match(/(\d+(?:\.\d+)?)\/5/);
+  const match = String(raw || '').match(/(\d+(?:\.\d+)?)\/5/);
   return match ? Number(match[1]) : null;
 }
 
 function average(values) {
-  const nums = values.filter(v => Number.isFinite(v));
+  const nums = values.filter(value => Number.isFinite(value));
   if (!nums.length) return null;
   return nums.reduce((sum, value) => sum + value, 0) / nums.length;
 }
 
-function percent(part, total) {
+function percentage(part, total) {
   if (!total) return null;
   return (part / total) * 100;
+}
+
+function round1(value) {
+  return value == null ? null : Math.round(value * 10) / 10;
 }
 
 function increment(map, key, amount = 1) {
@@ -66,6 +75,11 @@ function increment(map, key, amount = 1) {
 
 function topEntries(map, limit = 10) {
   return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+}
+
+function parseMarkdownLinkTarget(cell) {
+  const match = String(cell || '').match(/\[[^\]]+\]\(([^)]+)\)/);
+  return match ? match[1] : null;
 }
 
 function parseApplicationsMarkdown(content) {
@@ -85,6 +99,10 @@ function parseApplicationsMarkdown(content) {
     if (cells.length < 9) continue;
 
     const [num, date, company, role, scoreRaw, statusRaw, pdfRaw, reportRaw, notes] = cells;
+    const statusId = normalizeStatusId(statusRaw);
+    const reportPath = parseMarkdownLinkTarget(reportRaw);
+    const reportFilename = reportPath ? reportPath.split('/').pop() : null;
+
     rows.push({
       num,
       date,
@@ -92,9 +110,12 @@ function parseApplicationsMarkdown(content) {
       role,
       score: parseScore(scoreRaw),
       scoreRaw,
+      statusId,
       status: normalizeStatusLabel(statusRaw) ?? statusRaw,
       pdf: pdfRaw,
       report: reportRaw,
+      reportPath,
+      reportFilename,
       notes,
     });
   }
@@ -102,28 +123,126 @@ function parseApplicationsMarkdown(content) {
   return rows;
 }
 
-function parseReport(content, filename) {
-  const getField = (label) => {
-    const pattern = new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+)`, 'i');
-    return content.match(pattern)?.[1]?.trim() ?? null;
-  };
+function parseTable(lines, startIndex) {
+  const headerLine = lines[startIndex];
+  const separatorLine = lines[startIndex + 1];
+  if (!headerLine?.startsWith('|') || !separatorLine?.startsWith('|')) return null;
+  if (!separatorLine.includes('---')) return null;
 
-  const titleMatch = content.match(/^#\s+Evaluation:\s+(.+?)\s+--\s+(.+)$/m);
-  const recommendationMatch = content.match(/^(APPLY NOW|NETWORK FIRST|GOOD STRETCH|MONITOR|SKIP)$/m);
+  const headers = headerLine
+    .split('|')
+    .slice(1, -1)
+    .map(cell => cell.trim());
+  const rows = [];
+
+  let index = startIndex + 2;
+  while (index < lines.length && lines[index].startsWith('|')) {
+    const values = lines[index]
+      .split('|')
+      .slice(1, -1)
+      .map(cell => cell.trim());
+    if (values.length === headers.length) {
+      rows.push(Object.fromEntries(headers.map((header, columnIndex) => [header, values[columnIndex]])));
+    }
+    index += 1;
+  }
+
+  return { headers, rows, nextIndex: index };
+}
+
+function extractTables(content) {
+  const lines = content.split(/\r?\n/);
+  const tables = [];
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const table = parseTable(lines, index);
+    if (!table) continue;
+    tables.push({ headers: table.headers, rows: table.rows });
+    index = table.nextIndex - 1;
+  }
+
+  return tables;
+}
+
+function findTable(tables, headers) {
+  return tables.find(table => headers.every(header => table.headers.includes(header))) ?? null;
+}
+
+function normalizeCellText(value) {
+  return String(value || '')
+    .replace(/`/g, '')
+    .trim();
+}
+
+function tableToKeyValueMap(table, keyHeader, valueHeader) {
+  const result = new Map();
+  if (!table) return result;
+  for (const row of table.rows) {
+    result.set(normalizeCellText(row[keyHeader]), normalizeCellText(row[valueHeader]));
+  }
+  return result;
+}
+
+function extractField(content, label) {
+  const pattern = new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+)`, 'i');
+  return content.match(pattern)?.[1]?.trim() ?? null;
+}
+
+function extractRecommendation(content) {
+  const headingMatch = content.match(/## Final Recommendation\s+`([^`]+)`/i);
+  if (headingMatch) return headingMatch[1].trim();
+
+  const lineMatch = content.match(/^(APPLY NOW|NETWORK FIRST|GOOD STRETCH|MONITOR|SKIP)$/m);
+  return lineMatch?.[1] ?? null;
+}
+
+function extractReportTitle(content) {
+  const match = content.match(/^#\s+Evaluation:\s+(.+?)\s+--\s+(.+)$/m);
+  return {
+    company: match?.[1]?.trim() ?? null,
+    role: match?.[2]?.trim() ?? null,
+  };
+}
+
+function parseReport(content, filename) {
+  const title = extractReportTitle(content);
+  const tables = extractTables(content);
+  const roleSummaryTable = findTable(tables, ['Field', 'Value']);
+  const gapsTable = findTable(tables, ['Gap', 'Blocker?', 'Adjacent coverage', 'Honest mitigation plan']);
+  const authTable = findTable(tables, ['Item', 'Value']);
+
+  const roleSummary = tableToKeyValueMap(roleSummaryTable, 'Field', 'Value');
+  const authorization = tableToKeyValueMap(authTable, 'Item', 'Value');
 
   return {
     filename,
-    company: titleMatch?.[1]?.trim() ?? null,
-    role: titleMatch?.[2]?.trim() ?? null,
-    date: getField('Date'),
-    track: getField('Track'),
-    careerStage: getField('Career Stage'),
-    authorizationSignal: getField('Authorization Signal'),
-    workAuthorization: getField('Work Authorization'),
-    score: parseScore(getField('Score')),
-    url: getField('URL'),
-    pdf: getField('PDF'),
-    recommendation: recommendationMatch?.[1] ?? null,
+    company: title.company,
+    role: title.role,
+    date: extractField(content, 'Date'),
+    track: extractField(content, 'Track') ?? roleSummary.get('Primary role pack') ?? null,
+    secondaryTrack: roleSummary.get('Secondary pack') ?? null,
+    careerStage: extractField(content, 'Career Stage') ?? roleSummary.get('Career stage fit') ?? null,
+    authorizationSignal: extractField(content, 'Authorization Signal') ?? roleSummary.get('Authorization signal') ?? null,
+    workAuthorization: extractField(content, 'Work Authorization') ?? authorization.get('Candidate work authorization summary') ?? null,
+    score: parseScore(extractField(content, 'Score')),
+    url: extractField(content, 'URL'),
+    pdf: extractField(content, 'PDF'),
+    verification: extractField(content, 'Verification'),
+    recommendation: extractRecommendation(content),
+    companyClass: roleSummary.get('Company class') ?? null,
+    functionSummary: roleSummary.get('Function') ?? null,
+    seniority: roleSummary.get('Seniority') ?? null,
+    workModel: roleSummary.get('Work model') ?? null,
+    sponsorshipFitSummary: roleSummary.get('Sponsorship fit summary') ?? null,
+    recommendedAction: authorization.get('Recommended action') ?? null,
+    gaps: gapsTable
+      ? gapsTable.rows.map(row => ({
+          gap: normalizeCellText(row.Gap),
+          blocker: normalizeCellText(row['Blocker?']),
+          adjacentCoverage: normalizeCellText(row['Adjacent coverage']),
+          mitigation: normalizeCellText(row['Honest mitigation plan']),
+        }))
+      : [],
   };
 }
 
@@ -131,115 +250,333 @@ function loadReports() {
   if (!existsSync(reportsDir)) return [];
 
   return readdirSync(reportsDir)
-    .filter(name => name.endsWith('.md'))
-    .map(name => {
-      const path = join(reportsDir, name);
-      return parseReport(readFileSync(path, 'utf-8'), name);
-    });
+    .filter(name => name.endsWith('.md') && name !== '.gitkeep')
+    .map(name => parseReport(readFileSync(join(reportsDir, name), 'utf-8'), name));
 }
 
-function tokenizeRole(role) {
-  return String(role || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9\s/&-]/g, ' ')
-    .split(/\s+/)
-    .map(token => token.trim())
-    .filter(token =>
-      token &&
-      token.length > 2 &&
-      !['and', 'for', 'the', 'with', 'senior', 'associate', 'manager'].includes(token)
-    );
+function classifyOutcome(statusId) {
+  if (['applied', 'responded', 'interview', 'offer'].includes(statusId)) return 'positive';
+  if (['rejected', 'discarded'].includes(statusId)) return 'negative';
+  if (statusId === 'skip') return 'self_filtered';
+  return 'pending';
+}
+
+function classifyWorkModel(workModel) {
+  const value = String(workModel || '').toLowerCase();
+  if (!value) return 'unknown';
+  if (/\b(us only|usa only|canada only|citizenship|clearance)\b/.test(value)) return 'geo_restricted';
+  if (/\bworldwide|global|anywhere\b/.test(value) && /\bremote\b/.test(value)) return 'global_remote';
+  if (/\bremote\b/.test(value)) return 'remote';
+  if (/\bhybrid\b/.test(value)) return 'hybrid';
+  if (/\btravel|field\b/.test(value)) return 'travel_heavy';
+  if (/\bboston|cambridge|new york|san francisco|seattle|onsite|on-site\b/.test(value)) return 'local_cluster_or_onsite';
+  return 'unknown';
+}
+
+function classifyGapTheme(gap) {
+  const text = `${gap.gap} ${gap.mitigation}`.toLowerCase();
+  if (/\bvisa|sponsorship|authorization|work permit\b/.test(text)) return 'sponsorship_friction';
+  if (/\blocation|relocation|remote|travel|onsite|on-site|geo\b/.test(text)) return 'location_friction';
+  if (/\bventure|investment banking|investor|fundraising|capital markets|finance|underwriting\b/.test(text)) return 'finance_and_investing_gap';
+  if (/\bbusiness development|sales|commercial\b/.test(text)) return 'commercial_execution_gap';
+  if (/\bpitchbook|evaluate pharma|salesforce|tableau|excel|crm|tool\b/.test(text)) return 'tooling_gap';
+  if (/\breal estate|tenant\b/.test(text)) return 'domain_context_gap';
+  if (/\bsenior|staff|lead|principal|director|manager\b/.test(text)) return 'seniority_gap';
+  if (/\btherapeutic|disease area|oncology|immunology|clinical\b/.test(text)) return 'functional_or_domain_gap';
+  return 'general_transition_gap';
+}
+
+function formatPct(value) {
+  return value == null ? 'N/A' : `${value.toFixed(1)}%`;
+}
+
+function formatScore(value) {
+  return value == null ? 'N/A' : `${value.toFixed(1)}/5`;
+}
+
+function dateRange(applications, reports) {
+  const dates = [...applications.map(item => item.date), ...reports.map(item => item.date)]
+    .filter(Boolean)
+    .sort();
+  return {
+    from: dates[0] ?? null,
+    to: dates[dates.length - 1] ?? null,
+  };
+}
+
+function buildThresholdAnalysis(applications) {
+  const scored = applications.filter(item => Number.isFinite(item.score));
+  const positive = scored.filter(item => item.outcome === 'positive');
+  const negativeLike = scored.filter(item => ['negative', 'self_filtered'].includes(item.outcome));
+
+  if (positive.length === 0) {
+    return {
+      recommendedMinimumScore: 4.0,
+      positiveMin: null,
+      positiveMax: null,
+      negativeMax: negativeLike.length ? Math.max(...negativeLike.map(item => item.score)) : null,
+      reasoning: 'No positive outcomes are recorded yet, so the default floor stays at 4.0/5 until more data arrives.',
+    };
+  }
+
+  const positiveScores = positive.map(item => item.score);
+  const positiveMin = Math.min(...positiveScores);
+  const positiveMax = Math.max(...positiveScores);
+  const negativeMax = negativeLike.length ? Math.max(...negativeLike.map(item => item.score)) : null;
+  const recommended = round1(positiveMin);
+  const overlap = negativeMax != null && negativeMax >= recommended;
+
+  return {
+    recommendedMinimumScore: recommended,
+    positiveMin: round1(positiveMin),
+    positiveMax: round1(positiveMax),
+    negativeMax: round1(negativeMax),
+    reasoning: overlap
+      ? `Positive outcomes begin at ${formatScore(positiveMin)}, but lower-quality outcomes still overlap near that range. Keep ${formatScore(recommended)} as the floor and require a stronger override when scores land near the overlap zone.`
+      : `Every positive outcome so far is at or above ${formatScore(positiveMin)}. That makes ${formatScore(recommended)} a defensible evidence-based floor for future applications.`,
+  };
+}
+
+function breakdownFromMap(map, label) {
+  return [...map.entries()]
+    .map(([key, stats]) => ({
+      [label]: key,
+      total: stats.total,
+      positive: stats.positive,
+      negative: stats.negative,
+      selfFiltered: stats.self_filtered,
+      pending: stats.pending,
+      conversionRate: round1(percentage(stats.positive, stats.total)),
+    }))
+    .sort((a, b) => b.total - a.total);
 }
 
 function summarizePatterns(applications, reports) {
-  const statusCounts = new Map();
-  const trackCounts = new Map();
-  const stageCounts = new Map();
-  const authCounts = new Map();
-  const recommendationCounts = new Map();
-  const roleWordCounts = new Map();
+  const reportByFilename = new Map(reports.map(report => [report.filename, report]));
 
-  for (const row of applications) {
-    increment(statusCounts, row.status || 'Unknown');
-    for (const token of tokenizeRole(row.role)) {
-      increment(roleWordCounts, token);
+  const enrichedApplications = applications.map(application => {
+    const report = application.reportFilename ? reportByFilename.get(application.reportFilename) ?? null : null;
+    const outcome = classifyOutcome(application.statusId);
+    const score = Number.isFinite(application.score) ? application.score : report?.score ?? null;
+    return {
+      ...application,
+      report,
+      score,
+      outcome,
+      track: report?.track ?? null,
+      careerStage: report?.careerStage ?? null,
+      authorizationSignal: report?.authorizationSignal ?? null,
+      workModelBucket: classifyWorkModel(report?.workModel),
+      companyClass: report?.companyClass ?? null,
+    };
+  });
+
+  const total = enrichedApplications.length;
+  const progressed = enrichedApplications.filter(item => item.outcome !== 'pending').length;
+  const range = dateRange(enrichedApplications, reports);
+
+  const funnelCounts = new Map();
+  const outcomeCounts = new Map();
+  const trackStats = new Map();
+  const stageStats = new Map();
+  const authStats = new Map();
+  const workModelStats = new Map();
+  const companyClassStats = new Map();
+  const blockerStats = new Map();
+  const blockerOutcomeStats = new Map();
+  const recommendationCounts = new Map();
+  const roleTermCounts = new Map();
+
+  for (const item of enrichedApplications) {
+    increment(funnelCounts, item.status ?? 'Unknown');
+    increment(outcomeCounts, item.outcome);
+
+    for (const term of String(item.role || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s/&-]/g, ' ')
+      .split(/\s+/)
+      .filter(token => token && token.length > 2 && !['and', 'for', 'the', 'with', 'senior', 'associate', 'manager'].includes(token))) {
+      increment(roleTermCounts, term);
+    }
+
+    const breakdownTargets = [
+      [trackStats, item.track ?? 'unknown'],
+      [stageStats, item.careerStage ?? 'unknown'],
+      [authStats, item.authorizationSignal ?? 'unknown'],
+      [workModelStats, item.workModelBucket ?? 'unknown'],
+      [companyClassStats, item.companyClass ?? 'unknown'],
+    ];
+
+    for (const [map, key] of breakdownTargets) {
+      const current = map.get(key) ?? { total: 0, positive: 0, negative: 0, self_filtered: 0, pending: 0 };
+      current.total += 1;
+      current[item.outcome] += 1;
+      map.set(key, current);
+    }
+
+    if (item.report?.recommendation) {
+      increment(recommendationCounts, item.report.recommendation);
+    }
+
+    const seenThemes = new Set();
+    for (const gap of item.report?.gaps ?? []) {
+      const theme = classifyGapTheme(gap);
+      if (seenThemes.has(theme)) continue;
+      seenThemes.add(theme);
+      increment(blockerStats, theme);
+      const outcomeMap = blockerOutcomeStats.get(theme) ?? new Map();
+      increment(outcomeMap, item.outcome);
+      blockerOutcomeStats.set(theme, outcomeMap);
     }
   }
 
-  for (const report of reports) {
-    increment(trackCounts, report.track || 'Unknown');
-    increment(stageCounts, report.careerStage || 'Unknown');
-    increment(authCounts, report.authorizationSignal || 'unknown');
-    increment(recommendationCounts, report.recommendation || 'Unknown');
-  }
+  const scoreComparison = ['positive', 'negative', 'self_filtered', 'pending'].map(outcome => {
+    const scores = enrichedApplications
+      .filter(item => item.outcome === outcome)
+      .map(item => item.score)
+      .filter(Number.isFinite);
+    return {
+      outcome,
+      count: scores.length,
+      avgScore: round1(average(scores)),
+      minScore: scores.length ? round1(Math.min(...scores)) : null,
+      maxScore: scores.length ? round1(Math.max(...scores)) : null,
+    };
+  });
 
-  const totalApplications = applications.length;
-  const totalReports = reports.length;
-  const avgScore = average(applications.map(row => row.score));
-  const appliedCount = applications.filter(row => row.status === 'Applied').length;
-  const interviewCount = applications.filter(row => row.status === 'Interview').length;
-  const offerCount = applications.filter(row => row.status === 'Offer').length;
-  const rejectedCount = applications.filter(row => row.status === 'Rejected').length;
-  const skipCount = applications.filter(row => row.status === 'SKIP').length;
-  const generatedPdfCount = applications.filter(row => row.pdf?.includes('✅')).length;
+  const scoreThreshold = buildThresholdAnalysis(enrichedApplications);
 
-  const highScoreNotApplied = applications
-    .filter(row => Number.isFinite(row.score) && row.score >= 4.2 && !['Applied', 'Interview', 'Offer', 'Responded'].includes(row.status))
+  const highScoreNotApplied = enrichedApplications
+    .filter(item => Number.isFinite(item.score) && item.score >= scoreThreshold.recommendedMinimumScore && item.outcome === 'pending')
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-    .slice(0, 8);
+    .slice(0, 8)
+    .map(item => ({
+      company: item.company,
+      role: item.role,
+      score: round1(item.score),
+      status: item.status,
+      track: item.track,
+    }));
 
-  const lowScoreApplied = applications
-    .filter(row => Number.isFinite(row.score) && row.score < 4.0 && ['Applied', 'Interview', 'Responded', 'Offer'].includes(row.status))
+  const lowScoreApplied = enrichedApplications
+    .filter(item => Number.isFinite(item.score) && item.score < 4.0 && item.outcome === 'positive')
     .sort((a, b) => (a.score ?? 0) - (b.score ?? 0))
-    .slice(0, 8);
+    .slice(0, 8)
+    .map(item => ({
+      company: item.company,
+      role: item.role,
+      score: round1(item.score),
+      status: item.status,
+      track: item.track,
+    }));
+
+  const blockerAnalysis = topEntries(blockerStats, 10).map(([theme, count]) => {
+    const outcomes = blockerOutcomeStats.get(theme) ?? new Map();
+    return {
+      blocker: theme,
+      count,
+      percent: round1(percentage(count, total)),
+      positive: outcomes.get('positive') ?? 0,
+      negative: outcomes.get('negative') ?? 0,
+      selfFiltered: outcomes.get('self_filtered') ?? 0,
+      pending: outcomes.get('pending') ?? 0,
+    };
+  });
 
   const recommendations = [];
 
-  if (highScoreNotApplied.length >= 3) {
-    recommendations.push(`You have ${highScoreNotApplied.length} high-scoring roles that did not convert into applications or active processes. Review whether hesitation is coming from timing, outreach, resume variant quality, or avoidable uncertainty.`);
+  if (progressed < minThreshold) {
+    recommendations.push({
+      impact: 'medium',
+      action: `Keep collecting data until at least ${minThreshold} applications move beyond evaluation before treating these findings as policy.`,
+      reasoning: `Only ${progressed} applications have progressed beyond evaluation, so the sample is directionally useful but still small.`,
+    });
+  }
+
+  if (highScoreNotApplied.length >= 2) {
+    recommendations.push({
+      impact: 'high',
+      action: 'Create a fast-review lane for high-scoring roles that are still stuck in Evaluated status.',
+      reasoning: `${highScoreNotApplied.length} strong-fit roles are not converting into active applications even though they already cleared the current score floor.`,
+    });
   }
 
   if (lowScoreApplied.length >= 2) {
-    recommendations.push(`You are spending time on lower-scoring roles that converted to active applications. Tighten the minimum apply threshold or require a stronger strategic override before applying.`);
+    recommendations.push({
+      impact: 'high',
+      action: 'Raise the application bar or require an explicit override for roles below 4.0/5.',
+      reasoning: `${lowScoreApplied.length} lower-scoring roles still consumed application effort, which suggests drift or overly optimistic overrides.`,
+    });
   }
 
-  const unknownAuth = authCounts.get('unknown') ?? 0;
-  const closedOrRestrictedAuth = (authCounts.get('closed') ?? 0) + (authCounts.get('restricted') ?? 0);
-  if (closedOrRestrictedAuth > 0) {
-    recommendations.push(`Sponsorship or authorization friction is appearing in ${closedOrRestrictedAuth} evaluated roles. Consider adjusting scan filters, target employers, or networking-first tactics for companies with unclear policy.`);
-  } else if (unknownAuth > 0) {
-    recommendations.push(`Most authorization signals are still unknown. Strengthen scan-time capture of sponsorship language and log employer policy when you evaluate roles.`);
+  const sponsorshipFriction = blockerAnalysis.find(item => item.blocker === 'sponsorship_friction');
+  const authRestricted = authStats.get('restricted')?.total ?? 0;
+  const authClosed = authStats.get('closed')?.total ?? 0;
+  if ((sponsorshipFriction?.count ?? 0) > 0 || authRestricted + authClosed > 0) {
+    recommendations.push({
+      impact: 'high',
+      action: 'Tighten sponsorship and authorization filters in discovery, and flag networking-first handling for ambiguous employers.',
+      reasoning: 'Authorization friction is showing up both in structured report fields and in repeated blocker themes.',
+    });
   }
 
-  if ((trackCounts.get('life_sciences_consulting') ?? 0) > (trackCounts.get('biopharma_medical') ?? 0) * 2) {
-    recommendations.push('Your evaluated mix is heavily tilted toward life sciences consulting. Confirm that this matches your actual target mix or expand biopharma and health-tech discovery.');
+  const trackBreakdown = breakdownFromMap(trackStats, 'track');
+  if (trackBreakdown.length >= 2 && trackBreakdown[0].total >= trackBreakdown[1].total * 2) {
+    recommendations.push({
+      impact: 'medium',
+      action: `Rebalance discovery if the current mix is unintentionally over-weighting ${trackBreakdown[0].track}.`,
+      reasoning: 'The tracker is heavily concentrated in one track, which can hide better opportunities in the other enabled role packs.',
+    });
   }
 
   if (!recommendations.length) {
-    recommendations.push('The current data does not show a major negative pattern yet. Keep evaluating consistently so the system can learn from stronger signal.');
+    recommendations.push({
+      impact: 'medium',
+      action: 'Keep the current search strategy and continue collecting reports.',
+      reasoning: 'The current dataset does not show a clear negative pattern that justifies a major workflow change yet.',
+    });
   }
 
   return {
     generatedAt: new Date().toISOString(),
+    metadata: {
+      totalApplications: total,
+      totalReports: reports.length,
+      progressedApplications: progressed,
+      minimumProgressedThreshold: minThreshold,
+      enoughData: progressed >= minThreshold,
+      dateRange: range,
+      outcomeCounts: {
+        positive: outcomeCounts.get('positive') ?? 0,
+        negative: outcomeCounts.get('negative') ?? 0,
+        selfFiltered: outcomeCounts.get('self_filtered') ?? 0,
+        pending: outcomeCounts.get('pending') ?? 0,
+      },
+    },
     totals: {
-      applications: totalApplications,
-      reports: totalReports,
-      averageScore: avgScore,
-      pdfRate: percent(generatedPdfCount, totalApplications),
-      appliedRate: percent(appliedCount, totalApplications),
-      interviewRate: percent(interviewCount, totalApplications),
-      offerRate: percent(offerCount, totalApplications),
-      rejectedRate: percent(rejectedCount, totalApplications),
-      skipRate: percent(skipCount, totalApplications),
+      averageScore: round1(average(enrichedApplications.map(item => item.score))),
+      pdfRate: round1(percentage(enrichedApplications.filter(item => String(item.pdf || '').includes('✅')).length, total)),
+      appliedRate: round1(percentage(enrichedApplications.filter(item => item.statusId === 'applied').length, total)),
+      interviewRate: round1(percentage(enrichedApplications.filter(item => item.statusId === 'interview').length, total)),
+      offerRate: round1(percentage(enrichedApplications.filter(item => item.statusId === 'offer').length, total)),
+      rejectedRate: round1(percentage(enrichedApplications.filter(item => item.statusId === 'rejected').length, total)),
+      skipRate: round1(percentage(enrichedApplications.filter(item => item.statusId === 'skip').length, total)),
     },
-    counts: {
-      statuses: topEntries(statusCounts, 20),
-      tracks: topEntries(trackCounts, 10),
-      stages: topEntries(stageCounts, 10),
-      authorizationSignals: topEntries(authCounts, 10),
-      recommendations: topEntries(recommendationCounts, 10),
-      roleTerms: topEntries(roleWordCounts, 12),
-    },
+    funnel: [...funnelCounts.entries()].map(([status, count]) => ({
+      status,
+      count,
+      percent: round1(percentage(count, total)),
+    })),
+    scoreComparison,
+    trackBreakdown,
+    stageBreakdown: breakdownFromMap(stageStats, 'careerStage'),
+    authorizationBreakdown: breakdownFromMap(authStats, 'authorizationSignal'),
+    remotePolicy: breakdownFromMap(workModelStats, 'workModel'),
+    companyClassBreakdown: breakdownFromMap(companyClassStats, 'companyClass'),
+    blockerAnalysis,
+    scoreThreshold,
+    recommendationBreakdown: topEntries(recommendationCounts, 10).map(([recommendation, count]) => ({ recommendation, count })),
+    roleTerms: topEntries(roleTermCounts, 12).map(([term, count]) => ({ term, count })),
     highlights: {
       highScoreNotApplied,
       lowScoreApplied,
@@ -248,112 +585,139 @@ function summarizePatterns(applications, reports) {
   };
 }
 
-function formatPct(value) {
-  return value == null ? 'N/A' : `${value.toFixed(1)}%`;
-}
-
-function formatScore(value) {
-  return value == null ? 'N/A' : `${value.toFixed(2)}/5`;
-}
-
-function formatTable(entries, headers) {
-  if (!entries.length) return '_No data yet._';
-  const lines = [
-    `| ${headers.join(' | ')} |`,
-    `| ${headers.map(() => '---').join(' | ')} |`,
-  ];
-
-  for (const entry of entries) {
-    lines.push(`| ${entry.join(' | ')} |`);
-  }
-
-  return lines.join('\n');
+function formatTable(rows, headers) {
+  if (!rows.length) return '_No data yet._';
+  const headerLine = `| ${headers.join(' | ')} |`;
+  const separatorLine = `| ${headers.map(() => '---').join(' | ')} |`;
+  const bodyLines = rows.map(row => `| ${headers.map(header => row[header] ?? 'N/A').join(' | ')} |`);
+  return [headerLine, separatorLine, ...bodyLines].join('\n');
 }
 
 function renderMarkdown(summary) {
-  const statusTable = formatTable(
-    summary.counts.statuses.map(([label, count]) => [label, String(count)]),
-    ['Status', 'Count'],
-  );
+  if (summary.metadata.totalApplications === 0) {
+    return `# Pattern Analysis - ${today()}
 
-  const trackTable = formatTable(
-    summary.counts.tracks.map(([label, count]) => [label, String(count)]),
-    ['Track', 'Count'],
-  );
+No tracker data was found yet. Add evaluations and application outcomes, then rerun the analysis.
+`;
+  }
 
-  const authTable = formatTable(
-    summary.counts.authorizationSignals.map(([label, count]) => [label, String(count)]),
-    ['Authorization Signal', 'Count'],
-  );
+  const funnelRows = summary.funnel.map(item => ({
+    Stage: item.status,
+    Count: String(item.count),
+    '%': formatPct(item.percent),
+  }));
 
-  const roleTermsTable = formatTable(
-    summary.counts.roleTerms.map(([term, count]) => [term, String(count)]),
-    ['Role Term', 'Count'],
-  );
+  const scoreRows = summary.scoreComparison.map(item => ({
+    Outcome: item.outcome,
+    'Avg Score': formatScore(item.avgScore),
+    Min: formatScore(item.minScore),
+    Max: formatScore(item.maxScore),
+    Count: String(item.count),
+  }));
 
-  const highScoreTable = formatTable(
-    summary.highlights.highScoreNotApplied.map(row => [
-      row.company || 'Unknown',
-      row.role || 'Unknown',
-      formatScore(row.score),
-      row.status || 'Unknown',
-    ]),
-    ['Company', 'Role', 'Score', 'Current Status'],
-  );
+  const trackRows = summary.trackBreakdown.map(item => ({
+    Track: item.track,
+    Total: String(item.total),
+    Positive: String(item.positive),
+    'Conversion %': formatPct(item.conversionRate),
+  }));
 
-  const lowScoreTable = formatTable(
-    summary.highlights.lowScoreApplied.map(row => [
-      row.company || 'Unknown',
-      row.role || 'Unknown',
-      formatScore(row.score),
-      row.status || 'Unknown',
-    ]),
-    ['Company', 'Role', 'Score', 'Current Status'],
-  );
+  const stageRows = summary.stageBreakdown.map(item => ({
+    'Career Stage': item.careerStage,
+    Total: String(item.total),
+    Positive: String(item.positive),
+    'Conversion %': formatPct(item.conversionRate),
+  }));
 
-  return `# Career-Ops LifeSci Patterns Report
+  const authRows = summary.authorizationBreakdown.map(item => ({
+    'Authorization Signal': item.authorizationSignal,
+    Total: String(item.total),
+    Positive: String(item.positive),
+    'Conversion %': formatPct(item.conversionRate),
+  }));
 
-**Generated:** ${summary.generatedAt}
+  const blockerRows = summary.blockerAnalysis.map(item => ({
+    Blocker: item.blocker,
+    Count: String(item.count),
+    '%': formatPct(item.percent),
+    Positive: String(item.positive),
+    Negative: String(item.negative),
+    'Self-filtered': String(item.selfFiltered),
+  }));
 
-## Overview
+  const highScoreRows = summary.highlights.highScoreNotApplied.map(item => ({
+    Company: item.company || 'Unknown',
+    Role: item.role || 'Unknown',
+    Score: formatScore(item.score),
+    Status: item.status || 'Unknown',
+    Track: item.track || 'Unknown',
+  }));
 
-- Applications tracked: ${summary.totals.applications}
-- Reports analyzed: ${summary.totals.reports}
-- Average score: ${formatScore(summary.totals.averageScore)}
-- PDF generation rate: ${formatPct(summary.totals.pdfRate)}
-- Applied rate: ${formatPct(summary.totals.appliedRate)}
-- Interview rate: ${formatPct(summary.totals.interviewRate)}
-- Offer rate: ${formatPct(summary.totals.offerRate)}
-- Rejected rate: ${formatPct(summary.totals.rejectedRate)}
-- SKIP rate: ${formatPct(summary.totals.skipRate)}
+  const lowScoreRows = summary.highlights.lowScoreApplied.map(item => ({
+    Company: item.company || 'Unknown',
+    Role: item.role || 'Unknown',
+    Score: formatScore(item.score),
+    Status: item.status || 'Unknown',
+    Track: item.track || 'Unknown',
+  }));
 
-## Status Distribution
+  const recommendationLines = summary.recommendations.map((item, index) => (
+    `${index + 1}. **[${item.impact.toUpperCase()}]** ${item.action}\n   ${item.reasoning}`
+  ));
 
-${statusTable}
+  const sampleSizeNote = summary.metadata.enoughData
+    ? ''
+    : `\n> Sample-size note: only ${summary.metadata.progressedApplications}/${summary.metadata.minimumProgressedThreshold} applications have progressed beyond evaluation. Treat these findings as directional for now.\n`;
 
-## Track Mix
+  return `# Pattern Analysis - ${today()}
 
-${trackTable}
+**Applications analyzed:** ${summary.metadata.totalApplications}
+**Reports analyzed:** ${summary.metadata.totalReports}
+**Date range:** ${summary.metadata.dateRange.from ?? 'N/A'} to ${summary.metadata.dateRange.to ?? 'N/A'}
+**Outcomes:** ${summary.metadata.outcomeCounts.positive} positive, ${summary.metadata.outcomeCounts.negative} negative, ${summary.metadata.outcomeCounts.selfFiltered} self-filtered, ${summary.metadata.outcomeCounts.pending} pending
+${sampleSizeNote}
+## Conversion Funnel
 
-## Authorization Signals
+${formatTable(funnelRows, ['Stage', 'Count', '%'])}
 
-${authTable}
+## Score vs Outcome
 
-## Frequent Role Terms
+${formatTable(scoreRows, ['Outcome', 'Avg Score', 'Min', 'Max', 'Count'])}
 
-${roleTermsTable}
+## Track Performance
+
+${formatTable(trackRows, ['Track', 'Total', 'Positive', 'Conversion %'])}
+
+## Career Stage Alignment
+
+${formatTable(stageRows, ['Career Stage', 'Total', 'Positive', 'Conversion %'])}
+
+## Authorization Patterns
+
+${formatTable(authRows, ['Authorization Signal', 'Total', 'Positive', 'Conversion %'])}
+
+## Top Blockers
+
+${formatTable(blockerRows, ['Blocker', 'Count', '%', 'Positive', 'Negative', 'Self-filtered'])}
+
+## Recommended Score Threshold
+
+- Recommended floor: ${formatScore(summary.scoreThreshold.recommendedMinimumScore)}
+- Positive range: ${formatScore(summary.scoreThreshold.positiveMin)} to ${formatScore(summary.scoreThreshold.positiveMax)}
+- Highest negative or self-filtered score: ${formatScore(summary.scoreThreshold.negativeMax)}
+- Reasoning: ${summary.scoreThreshold.reasoning}
 
 ## High-Score Roles Not Yet Converting
 
-${highScoreTable}
+${formatTable(highScoreRows, ['Company', 'Role', 'Score', 'Status', 'Track'])}
 
 ## Low-Score Roles That Still Consumed Time
 
-${lowScoreTable}
+${formatTable(lowScoreRows, ['Company', 'Role', 'Score', 'Status', 'Track'])}
 
 ## Recommendations
 
-${summary.recommendations.map(item => `- ${item}`).join('\n')}
+${recommendationLines.join('\n\n')}
 `;
 }
 
@@ -361,16 +725,17 @@ function main() {
   const applications = parseApplicationsMarkdown(safeRead(applicationsPath));
   const reports = loadReports();
   const summary = summarizePatterns(applications, reports);
+  const markdown = renderMarkdown(summary);
 
   if (wantsJson) {
     console.log(JSON.stringify(summary, null, 2));
   } else {
-    console.log(renderMarkdown(summary));
+    console.log(markdown);
   }
 
   if (wantsWrite || explicitOut) {
     mkdirSync(join(ROOT, 'reports'), { recursive: true });
-    writeFileSync(outPath, renderMarkdown(summary), 'utf-8');
+    writeFileSync(outPath, markdown, 'utf-8');
     console.error(`Wrote patterns report to ${outPath}`);
   }
 }

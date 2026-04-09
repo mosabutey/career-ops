@@ -1,6 +1,7 @@
-# Mode: patterns -- Outcome and Pipeline Pattern Analysis
+# Mode: patterns - Outcome and Pipeline Pattern Analysis
 
-Analyze what the candidate's tracker and reports reveal about search quality, application behavior, and strategic drift.
+Analyze what the candidate's tracker and reports reveal about search quality,
+application behavior, and strategic drift.
 
 This mode is for learning from the search, not just evaluating one role.
 
@@ -20,29 +21,52 @@ Read:
 - `reports/` for evaluation reports
 - `config/profile.yml`
 - `modes/_profile.md` if narrative context is needed
+- `portals.yml` if recommendations may require scanner changes
 
 ## Workflow
 
-1. Run:
+1. Run the analyzer in JSON mode:
 
 ```bash
-node scripts/analyze-patterns.mjs
+node scripts/analyze-patterns.mjs --json
 ```
 
-2. Read the generated summary from stdout or run:
+2. Parse the output. It contains:
+   - `metadata`
+   - `funnel`
+   - `scoreComparison`
+   - `trackBreakdown`
+   - `stageBreakdown`
+   - `authorizationBreakdown`
+   - `remotePolicy`
+   - `companyClassBreakdown`
+   - `blockerAnalysis`
+   - `scoreThreshold`
+   - `highlights`
+   - `recommendations`
+
+3. If the user wants a saved report, run:
 
 ```bash
 node scripts/analyze-patterns.mjs --write
 ```
 
-3. Interpret the output in candidate-facing language.
 4. Focus on:
    - status conversion
    - score distribution
    - role-pack concentration
    - career-stage alignment
    - sponsorship or authorization friction
+   - repeated blocker themes from report gaps
    - repeated signals in high-fit or low-fit decisions
+
+## Sample Size Rule
+
+Check `metadata.enoughData`.
+
+If it is `false`, tell the user the findings are directional because too few
+applications have progressed beyond `Evaluated`. Still summarize what signal
+exists, but do not present the output as settled policy.
 
 ## Output
 
@@ -79,8 +103,15 @@ Recommend concrete next steps such as:
 If the user asks, write the output to:
 
 ```text
-reports/patterns-{YYYY-MM-DD}.md
+reports/pattern-analysis-{YYYY-MM-DD}.md
 ```
+
+## Apply Recommendations
+
+If the user wants recommendations applied:
+- edit `portals.yml` for scanner or filter changes
+- edit `modes/_profile.md` or `config/profile.yml` for thresholds, targeting, or narrative changes
+- never put user-specific strategy changes into `modes/_shared.md`
 
 ## Guidance
 

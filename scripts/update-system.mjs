@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * update-system.mjs — Safe auto-updater for career-ops
+ * update-system.mjs - Safe auto-updater for career-ops
  *
  * Updates ONLY system layer files (modes, scripts, dashboard, templates).
  * NEVER touches user data (cv.md, profile.yml, _profile.md, data/, reports/).
@@ -15,19 +15,17 @@
  * See DATA_CONTRACT.md for the full system/user layer definitions.
  */
 
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs';
-import { join, dirname } from 'path';
+import { join } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 const CANONICAL_REPO = 'https://github.com/santifer/career-ops.git';
 const RAW_VERSION_URL = 'https://raw.githubusercontent.com/santifer/career-ops/main/VERSION';
 const RELEASES_API = 'https://api.github.com/repos/santifer/career-ops/releases/latest';
 
-// System layer paths — ONLY these files get updated
 const SYSTEM_PATHS = [
   'AGENTS.md',
   'modes/_shared.md',
@@ -45,6 +43,7 @@ const SYSTEM_PATHS = [
   'modes/compare.md',
   'modes/ofertas.md',
   'modes/pipeline.md',
+  'modes/patterns.md',
   'modes/project.md',
   'modes/tracker.md',
   'modes/training.md',
@@ -88,13 +87,13 @@ const SYSTEM_PATHS = [
   'DATA_CONTRACT.md',
   'CONTRIBUTING.md',
   'README.md',
+  'SECURITY.md',
   'LICENSE',
   'CITATION.cff',
   '.github/',
   'package.json',
 ];
 
-// User layer paths — NEVER touch these (safety check)
 const USER_PATHS = [
   'cv.md',
   'config/profile.yml',
@@ -116,31 +115,45 @@ function localVersion() {
 function compareVersions(a, b) {
   const pa = a.split('.').map(Number);
   const pb = b.split('.').map(Number);
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i += 1) {
     if ((pa[i] || 0) < (pb[i] || 0)) return -1;
     if ((pa[i] || 0) > (pb[i] || 0)) return 1;
   }
   return 0;
 }
 
-function git(cmd) {
-  return execSync(`git ${cmd}`, { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }).trim();
+function git(...args) {
+  return execFileSync('git', args, {
+    cwd: ROOT,
+    encoding: 'utf-8',
+    timeout: 30000,
+  }).trim();
 }
 
-function stagePaths(paths) {
-  for (const path of paths) {
-    try {
-      git(`add -- "${path}"`);
-    } catch {
-      // Path may not exist locally or upstream.
-    }
-  }
+function gitStatusEntries() {
+  const status = git('status', '--porcelain');
+  if (!status) return [];
+
+  return status
+    .split('\n')
+    .filter(Boolean)
+    .map(line => ({
+      code: line.slice(0, 2),
+      path: line.slice(3),
+    }));
 }
 
-// ── CHECK ───────────────────────────────────────────────────────
+function revertPaths(paths) {
+  if (paths.length === 0) return;
+  git('checkout', '--', ...paths);
+}
+
+function addPaths(paths) {
+  if (paths.length === 0) return;
+  git('add', '--', ...paths);
+}
 
 async function check() {
-  // Respect dismiss flag
   if (existsSync(join(ROOT, '.update-dismissed'))) {
     console.log(JSON.stringify({ status: 'dismissed' }));
     return;
@@ -163,76 +176,69 @@ async function check() {
     return;
   }
 
-  // Fetch changelog from GitHub releases
   let changelog = '';
   try {
     const res = await fetch(RELEASES_API, {
-      headers: { 'Accept': 'application/vnd.github.v3+json' }
+      headers: { Accept: 'application/vnd.github.v3+json' },
     });
     if (res.ok) {
       const release = await res.json();
       changelog = release.body || '';
     }
   } catch {
-    // No changelog available, that's OK
+    // No changelog available.
   }
 
-  console.log(JSON.stringify({
-    status: 'update-available',
-    local,
-    remote,
-    changelog: changelog.slice(0, 500),
-  }));
+  console.log(
+    JSON.stringify({
+      status: 'update-available',
+      local,
+      remote,
+      changelog: changelog.slice(0, 500),
+    }),
+  );
 }
-
-// ── APPLY ───────────────────────────────────────────────────────
 
 async function apply() {
   const local = localVersion();
+  const initialStatusPaths = new Set(gitStatusEntries().map(entry => entry.path));
 
-  // Check for lock
   const lockFile = join(ROOT, '.update-lock');
   if (existsSync(lockFile)) {
     console.error('Update already in progress (.update-lock exists). If stuck, delete it manually.');
     process.exit(1);
   }
 
-  // Create lock
   writeFileSync(lockFile, new Date().toISOString());
 
   try {
-    // 1. Backup: create branch
     const backupBranch = `backup-pre-update-${local}`;
     try {
-      git(`branch ${backupBranch}`);
+      git('branch', backupBranch);
       console.log(`Backup branch created: ${backupBranch}`);
     } catch {
       console.log(`Backup branch already exists (${backupBranch}), continuing...`);
     }
 
-    // 2. Fetch from canonical repo
     console.log('Fetching latest from upstream...');
-    git(`fetch ${CANONICAL_REPO} main`);
+    git('fetch', CANONICAL_REPO, 'main');
 
-    // 3. Checkout system files only
     console.log('Updating system files...');
     const updated = [];
     for (const path of SYSTEM_PATHS) {
       try {
-        git(`checkout FETCH_HEAD -- ${path}`);
+        git('checkout', 'FETCH_HEAD', '--', path);
         updated.push(path);
       } catch {
-        // File may not exist in remote (new additions), skip
+        // Path may not exist upstream yet.
       }
     }
 
-    // 4. Validate: check NO user files were touched
     let userFileTouched = false;
     try {
-      const status = git('status --porcelain');
-      for (const line of status.split('\n')) {
-        if (!line.trim()) continue;
-        const file = line.slice(3);
+      for (const entry of gitStatusEntries()) {
+        const file = entry.path;
+        if (initialStatusPaths.has(file)) continue;
         for (const userPath of USER_PATHS) {
           if (file.startsWith(userPath)) {
             console.error(`SAFETY VIOLATION: User file was modified: ${file}`);
@@ -241,81 +247,74 @@ async function apply() {
         }
       }
     } catch {
-      // git status failed, skip validation
+      // Skip secondary validation if git status fails.
     }
 
     if (userFileTouched) {
       console.error('Aborting: user files were touched. Rolling back...');
-      git('checkout .');
-      unlinkSync(lockFile);
+      revertPaths(updated);
       process.exit(1);
     }
 
-    // 5. Install any new dependencies
     try {
       execSync('npm install --silent', { cwd: ROOT, timeout: 60000 });
     } catch {
       console.log('npm install skipped (may need manual run)');
     }
 
-    // 6. Clean up dismiss flag if it exists
-    const dismissFile = join(ROOT, '.update-dismissed');
-    if (existsSync(dismissFile)) unlinkSync(dismissFile);
-
-    stagePaths(SYSTEM_PATHS);
+    const remote = localVersion();
     try {
-      git('add -u -- ".update-dismissed"');
+      const pathsToStage = [...updated];
+      const dismissFile = join(ROOT, '.update-dismissed');
+      if (existsSync(dismissFile)) {
+        unlinkSync(dismissFile);
+        pathsToStage.push('.update-dismissed');
+      }
+      addPaths(pathsToStage);
+      git('commit', '-m', `chore: auto-update system files to v${remote}`);
     } catch {
-      // No dismiss flag changes to stage.
+      // Nothing new to commit.
     }
 
-    // 7. Commit the update
-    const remote = localVersion(); // Re-read after checkout updated VERSION
-    try {
-      git(`commit -m "chore: auto-update system files to v${remote}"`);
-    } catch {
-      // Nothing to commit (already up to date)
-    }
-
-    console.log(`\nUpdate complete: v${local} → v${remote}`);
+    console.log(`\nUpdate complete: v${local} -> v${remote}`);
     console.log(`Updated ${updated.length} system paths.`);
-    console.log(`Rollback available: node scripts/update-system.mjs rollback`);
-
+    console.log('Rollback available: node scripts/update-system.mjs rollback');
   } finally {
-    // Remove lock
     if (existsSync(lockFile)) unlinkSync(lockFile);
   }
 }
 
-// ── ROLLBACK ────────────────────────────────────────────────────
-
 function rollback() {
-  const local = localVersion();
-
-  // Find most recent backup branch
   try {
-    const branches = git('branch --list "backup-pre-update-*"');
-    const branchList = branches.split('\n').map(b => b.trim().replace('* ', '')).filter(Boolean);
+    const branches = git(
+      'for-each-ref',
+      '--sort=-committerdate',
+      '--format=%(refname:short)',
+      'refs/heads/backup-pre-update-*',
+    );
+    const branchList = branches
+      .split('\n')
+      .map(branch => branch.trim())
+      .filter(Boolean);
 
     if (branchList.length === 0) {
       console.error('No backup branches found. Nothing to rollback.');
       process.exit(1);
     }
 
-    const latest = branchList[branchList.length - 1];
+    const latest = branchList[0];
     console.log(`Rolling back to: ${latest}`);
 
-    // Checkout system files from backup branch
     for (const path of SYSTEM_PATHS) {
       try {
-        git(`checkout ${latest} -- ${path}`);
+        git('checkout', latest, '--', path);
       } catch {
-        // File may not have existed in backup
+        // Path may not have existed in the backup branch.
       }
     }
 
-    stagePaths(SYSTEM_PATHS);
-    git(`commit -m "chore: rollback system files from ${latest}"`);
+    addPaths(SYSTEM_PATHS);
+    git('commit', '-m', `chore: rollback system files from ${latest}`);
 
     console.log(`Rollback complete. System files restored from ${latest}.`);
     console.log('Your data (CV, profile, tracker, reports) was not affected.');
@@ -325,22 +324,28 @@ function rollback() {
   }
 }
 
-// ── DISMISS ─────────────────────────────────────────────────────
-
 function dismiss() {
   writeFileSync(join(ROOT, '.update-dismissed'), new Date().toISOString());
-  console.log('Update check dismissed. Run "node scripts/update-system.mjs check" or say "check for updates" to re-enable.');
+  console.log(
+    'Update check dismissed. Run "node scripts/update-system.mjs check" or say "check for updates" to re-enable.',
+  );
 }
-
-// ── MAIN ────────────────────────────────────────────────────────
 
 const cmd = process.argv[2] || 'check';
 
 switch (cmd) {
-  case 'check': await check(); break;
-  case 'apply': await apply(); break;
-  case 'rollback': rollback(); break;
-  case 'dismiss': dismiss(); break;
+  case 'check':
+    await check();
+    break;
+  case 'apply':
+    await apply();
+    break;
+  case 'rollback':
+    rollback();
+    break;
+  case 'dismiss':
+    dismiss();
+    break;
   default:
     console.log('Usage: node scripts/update-system.mjs [check|apply|rollback|dismiss]');
     process.exit(1);

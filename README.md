@@ -156,12 +156,14 @@ The core command surface works across Claude Code, Codex, and OpenCode:
 - `/career-ops {JD or URL}` -> full auto-pipeline
 - `/career-ops evaluate` -> evaluation only
 - `/career-ops compare` -> compare multiple roles
+- `/career-ops interview-prep` -> build company-specific prep and story framing
 - `/career-ops scan` -> scan portals and company pages
 - `/career-ops apply` -> browser-assisted application support
 - `/career-ops pdf` -> generate the best-fit document
 - `/career-ops patterns` -> learn from tracker and report data
 - `/career-ops pipeline` -> process saved URLs
 - `/career-ops batch` -> run parallel evaluation flows
+- `/career-ops update` -> check for or apply system-layer updates safely
 
 ### Opportunity evaluation
 

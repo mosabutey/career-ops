@@ -577,7 +577,7 @@ if (fileExists('templates/cv-template.html')) {
 const trackedFilesResult = runProcess('git', ['ls-files']);
 const trackedFiles = trackedFilesResult.status === 0
   ? trackedFilesResult.stdout.split(/\r?\n/).filter(Boolean)
-  : walkFiles(ROOT).map(({ relPath }) => relPath);
+  : null;
 const secretScanExtensions = new Set(['.md', '.yml', '.mjs', '.json', '.sh', '.go', '.html', '.cff']);
 const secretPatterns = [
   { name: 'private-key', regex: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },
@@ -589,13 +589,17 @@ const secretPatterns = [
 ];
 
 let secretFound = false;
-for (const relPath of trackedFiles) {
-  if (!secretScanExtensions.has(extname(relPath))) continue;
-  const content = readFile(relPath);
-  for (const { name, regex } of secretPatterns) {
-    if (regex.test(content)) {
-      fail(`Possible ${name} found in tracked file: ${relPath}`);
-      secretFound = true;
+if (trackedFiles === null) {
+  warn('Tracked-file secret scan skipped because git file discovery was unavailable in this environment');
+} else {
+  for (const relPath of trackedFiles) {
+    if (!secretScanExtensions.has(extname(relPath))) continue;
+    const content = readFile(relPath);
+    for (const { name, regex } of secretPatterns) {
+      if (regex.test(content)) {
+        fail(`Possible ${name} found in tracked file: ${relPath}`);
+        secretFound = true;
+      }
     }
   }
 }

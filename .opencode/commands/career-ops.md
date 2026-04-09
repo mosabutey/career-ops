@@ -12,6 +12,7 @@ Supported modes include:
 - `evaluate`
 - `compare`
 - `contact`
+- `interview-prep`
 - `pdf`
 - `apply`
 - `scan`
@@ -22,6 +23,7 @@ Supported modes include:
 - `deep`
 - `training`
 - `project`
+- `update`
 
 Load the career-ops skill:
 ```

@@ -43,7 +43,7 @@ To rollback: `node scripts/update-system.mjs rollback`
 
 ## What is Career-Ops LifeSci
 
-Local-first career intelligence built on Claude Code: opportunity evaluation, role-pack-aware CV generation, portal scanning, browser-assisted application support, batch processing, pattern analysis, and pipeline tracking.
+Local-first career intelligence built on local coding agents: opportunity evaluation, role-pack-aware CV generation, portal scanning, browser-assisted application support, batch processing, pattern analysis, and pipeline tracking.
 
 ### Main Files
 
@@ -55,6 +55,7 @@ Local-first career intelligence built on Claude Code: opportunity evaluation, ro
 | `portals.yml` | Query and company config |
 | `templates/cv-template.html` | HTML template for CVs |
 | `scripts/generate-pdf.mjs` | Playwright: HTML to PDF |
+| `scripts/analyze-patterns.mjs` | Pattern analysis script (JSON + report output) |
 | `article-digest.md` | Compact proof points from portfolio (optional) |
 | `interview-prep/story-bank.md` | Accumulated STAR+R stories across evaluations |
 | `interview-prep/{company}-{role}.md` | Company-specific interview intel reports |
@@ -76,10 +77,12 @@ When using [OpenCode](https://opencode.ai), the following slash commands are ava
 | `/career-ops-training` | `/career-ops training` | Evaluate course/cert against goals |
 | `/career-ops-project` | `/career-ops project` | Evaluate portfolio project idea |
 | `/career-ops-tracker` | `/career-ops tracker` | Application status overview |
+| `/career-ops-interview-prep` | `/career-ops interview-prep` | Build company-specific interview prep and story framing |
 | `/career-ops-apply` | `/career-ops apply` | Live application assistant |
 | `/career-ops-scan` | `/career-ops scan` | Scan portals for new offers |
 | `/career-ops-patterns` | `/career-ops patterns` | Analyze tracker and report patterns |
 | `/career-ops-batch` | `/career-ops batch` | Batch processing with parallel workers |
+| `/career-ops-update` | `/career-ops update` | Check for or apply system updates safely |
 
 **Note:** OpenCode commands invoke the same `.claude/skills/career-ops/SKILL.md` skill used by Claude Code. The `modes/*` files are shared between both platforms.
 
@@ -151,9 +154,9 @@ After the basics are set up, proactively ask for more context. The more you know
 >
 > The more context you give me, the better I filter. Think of it as onboarding a recruiter — the first week I need to learn about you, then I become invaluable."
 
-Store any insights the user shares in `config/profile.yml` or in `article-digest.md` if they share proof points. Update `modes/_shared.md` only when the shared system genuinely needs a broader role pack, stage path, or framing improvement.
+Store any insights the user shares in `config/profile.yml`, `modes/_profile.md`, or in `article-digest.md` if they share proof points. Update `modes/_shared.md` only when the shared system genuinely needs a broader role pack, stage path, or framing improvement.
 
-**After every evaluation, learn.** If the user says "this score is too high, I wouldn't apply here" or "you missed that I have experience in X", update your understanding. Adjust the framing in `_shared.md` or add notes to `profile.yml`. The system should get smarter with every interaction.
+**After every evaluation, learn.** If the user says "this score is too high, I wouldn't apply here" or "you missed that I have experience in X", update your understanding in `modes/_profile.md`, `config/profile.yml`, or `article-digest.md`. Only change `modes/_shared.md` when improving the shared system for everyone. The system should get smarter with every interaction.
 
 #### Step 6: Ready
 Once all files exist, confirm:
@@ -176,13 +179,13 @@ If the user accepts, use the `/loop` or `/schedule` skill (if available) to set 
 This system is designed to be customized by YOU (AI Agent). When the user asks you to change role packs, stage paths, translate modes, adjust scoring, add companies, or modify negotiation scripts, do it directly.
 
 **Common customization requests:**
-- "Change the role packs to medical affairs / consulting / health-tech" → edit `modes/_shared.md`, templates, and the relevant files in `modes/`
+- "Change the role packs to medical affairs / consulting / health-tech" → edit `modes/_profile.md`, `config/profile.yml`, templates, and the relevant files in `modes/` depending on whether the change is personal or shared
 - "Build internship and externship support" → edit `modes/_shared.md`, `config/profile.example.yml`, and `templates/portals.example.yml`
 - "Tailor the modes to my target roles" → edit the relevant files in `modes/`
 - "Add these companies to my portals" → edit `portals.yml`
 - "Update my profile" → edit `config/profile.yml`
 - "Change the CV template design" → edit `templates/cv-template.html`
-- "Adjust the scoring weights" → edit `modes/_shared.md` and `batch/batch-prompt.md`
+- "Adjust the scoring weights" → edit `modes/_profile.md` for user-specific weighting, or edit `modes/_shared.md` and `batch/batch-prompt.md` only when changing the shared defaults for everyone
 
 ### Language Modes
 
@@ -222,6 +225,7 @@ Default modes are in `modes/` (English). Additional language-specific modes are 
 | Wants to learn from application outcomes over time | `patterns` |
 | Processes pending URLs | `pipeline` |
 | Batch processes offers | `batch` |
+| Wants to check or apply system updates | `update` |
 
 ### CV Source of Truth
 
