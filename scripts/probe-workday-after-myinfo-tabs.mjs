@@ -5,7 +5,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const ROOT = dirname(fileURLToPath(import.meta.url));
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const ARTIFACT_DIR = join(ROOT, 'output', 'live-tests');
 
 function parseArgs(argv) {
@@ -317,7 +317,7 @@ async function run() {
   const url = args.url;
   const slug = slugify(args.slug || `workday-after-myinfo-tabs-${new Date().toISOString().slice(0, 10)}`);
   if (!email || !password || !url) {
-    console.error('Usage: WORKDAY_TEST_EMAIL=... WORKDAY_TEST_PASSWORD=... node probe-workday-after-myinfo-tabs.mjs --url="https://..." --slug=my-run');
+    console.error('Usage: WORKDAY_TEST_EMAIL=... WORKDAY_TEST_PASSWORD=... node scripts/probe-workday-after-myinfo-tabs.mjs --url="https://..." --slug=my-run');
     process.exit(1);
   }
 

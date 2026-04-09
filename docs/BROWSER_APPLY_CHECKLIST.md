@@ -8,7 +8,7 @@ For repeatable evidence capture, you can also run `npm run probe:apply -- --plat
 ## Pre-checks
 
 - `npm run doctor`
-- `node verify-pipeline.mjs`
+- `node scripts/verify-pipeline.mjs`
 - The correct resume variant exists in `output/`
 - The role has an evaluation report in `reports/`
 - The candidate has reviewed work authorization details in `config/profile.yml`

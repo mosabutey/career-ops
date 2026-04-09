@@ -108,8 +108,8 @@ The chosen family changes section order, vocabulary, and emphasis without invent
 
 The canonical tracker contract remains unchanged:
 - new rows flow through `batch/tracker-additions/`
-- `merge-tracker.mjs` merges them into `data/applications.md`
-- `verify-pipeline.mjs`, `normalize-statuses.mjs`, and `dedup-tracker.mjs` maintain consistency
+- `scripts/merge-tracker.mjs` merges them into `data/applications.md`
+- `scripts/verify-pipeline.mjs`, `scripts/normalize-statuses.mjs`, and `scripts/dedup-tracker.mjs` maintain consistency
 
 ## Operating boundary
 

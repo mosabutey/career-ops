@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const ROOT = dirname(fileURLToPath(import.meta.url));
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const ARTIFACT_DIR = join(ROOT, 'output', 'live-tests');
 const SESSION_ROOT = join(ROOT, 'output', 'browser-sessions');
 
@@ -390,7 +390,7 @@ async function injectHandoffBanner(page, reviewFocus) {
 
 function printHelp() {
   console.log(`Usage:
-  node assist-phenom-review-handoff.mjs --url="https://careers.example.com/...apply..."
+  node scripts/assist-phenom-review-handoff.mjs --url="https://careers.example.com/...apply..."
 
 Options:
   --url=...                 Required Phenom/Phenom People apply URL

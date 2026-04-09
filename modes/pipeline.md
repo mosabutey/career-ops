@@ -52,6 +52,6 @@ Process job URLs accumulated in `data/pipeline.md`. The user can keep adding URL
 
 Before processing any URL, verify synchronization:
 ```bash
-node cv-sync-check.mjs
+node scripts/cv-sync-check.mjs
 ```
 If there is a sync issue, warn the user before continuing.

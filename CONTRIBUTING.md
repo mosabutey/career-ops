@@ -55,10 +55,10 @@ Use fictional or anonymized data in `examples/`.
 ```bash
 # Node scripts
 npm run doctor
-node analyze-patterns.mjs
-node verify-pipeline.mjs
-node normalize-statuses.mjs
-node dedup-tracker.mjs
+node scripts/analyze-patterns.mjs
+node scripts/verify-pipeline.mjs
+node scripts/normalize-statuses.mjs
+node scripts/dedup-tracker.mjs
 
 # Dashboard
 cd dashboard

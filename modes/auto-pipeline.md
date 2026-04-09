@@ -66,6 +66,6 @@ If the final score is >= 4.5, generate draft answers for the application form:
 
 ## Step 5 -- Update the tracker
 
-Write a tracker TSV line to `batch/tracker-additions/` using the canonical order from `modes/evaluate.md`, then run `node merge-tracker.mjs` so the evaluated role is merged into `data/applications.md` without creating duplicates.
+Write a tracker TSV line to `batch/tracker-additions/` using the canonical order from `modes/evaluate.md`, then run `node scripts/merge-tracker.mjs` so the evaluated role is merged into `data/applications.md` without creating duplicates.
 
 **If any step fails**, continue with the next ones and mark the failed step as pending in the tracker.

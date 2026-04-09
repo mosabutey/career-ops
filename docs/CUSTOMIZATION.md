@@ -116,7 +116,7 @@ Do not put private personal data here.
 Use `/career-ops patterns` or:
 
 ```bash
-node analyze-patterns.mjs
+node scripts/analyze-patterns.mjs
 ```
 
 This helps you learn from:

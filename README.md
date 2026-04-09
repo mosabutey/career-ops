@@ -233,6 +233,7 @@ Repeat-company note:
 Best-practice handoff note:
 - when possible, prefer a visible browser handoff over a disposable headless run so the candidate can directly inspect the live ATS review page instead of relying only on screenshots
 - for Phenom / Phenom People employers, use `npm run apply:phenom-review -- --url="https://careers.example.com/.../apply?jobSeqNo=..."` to drive a visible review handoff from local profile data
+- the repo's operational automation now lives under `scripts/`, so direct script entry points follow the pattern `node scripts/<name>.mjs`
 - if a live review handoff is not possible, preserve a persistent session and rely on ATS saved-draft or returning-applicant recovery paths instead of starting over blindly
 - see [docs/APPLY_REVIEW_HANDOFF.md](docs/APPLY_REVIEW_HANDOFF.md) for the full handoff and recovery playbook
 

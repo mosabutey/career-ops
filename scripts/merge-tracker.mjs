@@ -10,7 +10,7 @@
  * Dedup: company normalized + role fuzzy match + report number match.
  * If duplicate with higher score -> update in place, update report link.
  *
- * Run: node career-ops/merge-tracker.mjs [--dry-run] [--verify]
+ * Run: node scripts/merge-tracker.mjs [--dry-run] [--verify]
  */
 
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, renameSync, existsSync } from 'fs';
@@ -23,7 +23,7 @@ import {
   normalizeStatusLabel,
 } from './tracker-contract.mjs';
 
-const CAREER_OPS = dirname(fileURLToPath(import.meta.url));
+const CAREER_OPS = fileURLToPath(new URL('..', import.meta.url));
 const APPS_FILE = existsSync(join(CAREER_OPS, 'data/applications.md'))
   ? join(CAREER_OPS, 'data/applications.md')
   : join(CAREER_OPS, 'applications.md');
@@ -291,7 +291,7 @@ if (VERIFY && !DRY_RUN) {
   console.log('\n--- Running verification ---');
   const { execSync } = await import('child_process');
   try {
-    execSync(`node ${join(CAREER_OPS, 'verify-pipeline.mjs')}`, { stdio: 'inherit' });
+    execSync(`node ${join(CAREER_OPS, 'scripts', 'verify-pipeline.mjs')}`, { stdio: 'inherit' });
   } catch {
     process.exit(1);
   }

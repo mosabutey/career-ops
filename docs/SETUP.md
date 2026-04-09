@@ -117,9 +117,9 @@ For visible review handoff and recovery paths, see [docs/APPLY_REVIEW_HANDOFF.md
 
 ```bash
 npm run doctor
-node cv-sync-check.mjs
-node verify-pipeline.mjs
-node analyze-patterns.mjs
+node scripts/cv-sync-check.mjs
+node scripts/verify-pipeline.mjs
+node scripts/analyze-patterns.mjs
 ```
 
 ## Optional dashboard

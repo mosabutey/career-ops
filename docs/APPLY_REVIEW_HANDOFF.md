@@ -27,7 +27,7 @@ Important usability note:
 For Phenom / Phenom People employers, the repo now includes:
 
 ```bash
-node assist-phenom-review-handoff.mjs --url="https://careers.example.com/us/en/apply?jobSeqNo=..."
+node scripts/assist-phenom-review-handoff.mjs --url="https://careers.example.com/us/en/apply?jobSeqNo=..."
 ```
 
 Default behavior:
@@ -44,7 +44,7 @@ Default behavior:
 Helpful options:
 
 ```bash
-node assist-phenom-review-handoff.mjs \
+node scripts/assist-phenom-review-handoff.mjs \
   --url="https://careers.example.com/us/en/apply?jobSeqNo=..." \
   --slug="acme-phenom-review" \
   --salary-text="Open to discussing compensation within the posted range." \

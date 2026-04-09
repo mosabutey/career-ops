@@ -11,10 +11,10 @@
  * - strongest and weakest application patterns
  *
  * Usage:
- *   node analyze-patterns.mjs
- *   node analyze-patterns.mjs --json
- *   node analyze-patterns.mjs --write
- *   node analyze-patterns.mjs --out reports/patterns-2026-04-08.md
+ *   node scripts/analyze-patterns.mjs
+ *   node scripts/analyze-patterns.mjs --json
+ *   node scripts/analyze-patterns.mjs --write
+ *   node scripts/analyze-patterns.mjs --out reports/patterns-2026-04-08.md
  */
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs';
@@ -22,7 +22,7 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { normalizeStatusLabel } from './tracker-contract.mjs';
 
-const ROOT = fileURLToPath(new URL('.', import.meta.url));
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const args = new Set(process.argv.slice(2));
 const wantsJson = args.has('--json');
 const wantsWrite = args.has('--write');

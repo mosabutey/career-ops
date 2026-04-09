@@ -7,8 +7,8 @@
  * Tests: syntax, scripts, PDF generation, dashboard, data contract, personal data, paths.
  *
  * Usage:
- *   node test-all.mjs
- *   node test-all.mjs --quick
+ *   node scripts/test-all.mjs
+ *   node scripts/test-all.mjs --quick
  */
 
 import { spawnSync } from 'child_process';
@@ -26,7 +26,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import vm from 'vm';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = __dirname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const QUICK = process.argv.includes('--quick');
 
 let passed = 0;
@@ -174,12 +174,12 @@ for (const file of mjsFiles) {
 console.log('\n2. Script execution (graceful on empty data)');
 
 const scripts = [
-  { args: ['cv-sync-check.mjs'], acceptableExits: [0, 1], allowFail: true },
-  { args: ['verify-pipeline.mjs'], expectExit: 0 },
-  { args: ['normalize-statuses.mjs', '--dry-run'], expectExit: 0 },
-  { args: ['dedup-tracker.mjs', '--dry-run'], expectExit: 0 },
-  { args: ['merge-tracker.mjs', '--dry-run'], expectExit: 0 },
-  { args: ['update-system.mjs', 'check'], expectExit: 0 },
+  { args: ['scripts/cv-sync-check.mjs'], acceptableExits: [0, 1], allowFail: true },
+  { args: ['scripts/verify-pipeline.mjs'], expectExit: 0 },
+  { args: ['scripts/normalize-statuses.mjs', '--dry-run'], expectExit: 0 },
+  { args: ['scripts/dedup-tracker.mjs', '--dry-run'], expectExit: 0 },
+  { args: ['scripts/merge-tracker.mjs', '--dry-run'], expectExit: 0 },
+  { args: ['scripts/update-system.mjs', 'check'], expectExit: 0 },
 ];
 
 for (const { args, expectExit, acceptableExits, allowFail } of scripts) {
@@ -259,13 +259,27 @@ const systemFiles = [
   'VERSION',
   'DATA_CONTRACT.md',
   'SECURITY.md',
-  'analyze-patterns.mjs',
-  'probe-apply-flow.mjs',
-  'probe-workday-auth.mjs',
-  'probe-workday-myinfo.mjs',
-  'probe-workday-signin.mjs',
-  'probe-workday-verify.mjs',
-  'tracker-contract.mjs',
+  'scripts/analyze-patterns.mjs',
+  'scripts/assist-phenom-review-handoff.mjs',
+  'scripts/check-liveness.mjs',
+  'scripts/cv-sync-check.mjs',
+  'scripts/dedup-tracker.mjs',
+  'scripts/doctor.mjs',
+  'scripts/generate-pdf.mjs',
+  'scripts/merge-tracker.mjs',
+  'scripts/normalize-statuses.mjs',
+  'scripts/probe-apply-flow.mjs',
+  'scripts/probe-workday-after-myinfo-tabs.mjs',
+  'scripts/probe-workday-auth.mjs',
+  'scripts/probe-workday-fill-myinfo.mjs',
+  'scripts/probe-workday-myinfo.mjs',
+  'scripts/probe-workday-picker-options.mjs',
+  'scripts/probe-workday-signin.mjs',
+  'scripts/probe-workday-step-tabs.mjs',
+  'scripts/probe-workday-verify.mjs',
+  'scripts/tracker-contract.mjs',
+  'scripts/update-system.mjs',
+  'scripts/verify-pipeline.mjs',
   'modes/_shared.md',
   'modes/_profile.template.md',
   'modes/evaluate.md',
@@ -329,7 +343,7 @@ const allowedLeakPaths = [
   '.github/FUNDING.yml',
   'CLAUDE.md',
   'AGENTS.md',
-  'test-all.mjs',
+  'scripts/test-all.mjs',
   '.github/ISSUE_TEMPLATE',
   'dashboard/internal/ui/screens/pipeline.go',
 ];
@@ -358,7 +372,7 @@ const allowedPathRefs = [
   'LICENSE',
   'CLAUDE.md',
   'AGENTS.md',
-  'test-all.mjs',
+  'scripts/test-all.mjs',
   'config/profile.yml',
   'cv.md',
   'article-digest.md',
@@ -538,15 +552,15 @@ if (fileExists('.gitignore')) {
   fail('.gitignore missing');
 }
 
-if (fileExists('generate-pdf.mjs')) {
-  const pdfGenerator = readFile('generate-pdf.mjs');
+if (fileExists('scripts/generate-pdf.mjs')) {
+  const pdfGenerator = readFile('scripts/generate-pdf.mjs');
   if (pdfGenerator.includes('page.route(') && pdfGenerator.includes('isSafeRenderUrl')) {
     pass('generate-pdf blocks remote render requests');
   } else {
     fail('generate-pdf does not clearly block remote render requests');
   }
 } else {
-  fail('generate-pdf.mjs missing');
+  fail('scripts/generate-pdf.mjs missing');
 }
 
 if (fileExists('templates/cv-template.html')) {

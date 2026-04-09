@@ -26,13 +26,13 @@ Read:
 1. Run:
 
 ```bash
-node analyze-patterns.mjs
+node scripts/analyze-patterns.mjs
 ```
 
 2. Read the generated summary from stdout or run:
 
 ```bash
-node analyze-patterns.mjs --write
+node scripts/analyze-patterns.mjs --write
 ```
 
 3. Interpret the output in candidate-facing language.

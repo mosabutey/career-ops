@@ -144,7 +144,7 @@ Every report must explain:
 
 0. **Cover letter:** if the form allows one, include one. Keep the same visual design as the resume, map JD language to real proof points, and keep it to one page maximum.
 1. Read `cv.md`, `config/profile.yml`, `modes/_profile.md`, and `article-digest.md` if present before evaluating.
-1b. **First evaluation of each session:** run `node cv-sync-check.mjs`. If it returns warnings, notify the user before continuing.
+1b. **First evaluation of each session:** run `node scripts/cv-sync-check.mjs`. If it returns warnings, notify the user before continuing.
 2. Detect role pack and career stage before scoring.
 3. Cite exact CV evidence when mapping fit.
 4. Use WebSearch for compensation and company context.
@@ -167,7 +167,7 @@ Every report must explain:
 | Write | Reports, temporary HTML for PDFs, cover letters when needed, and tracker TSV additions |
 | Edit | Existing tracker rows only. Do not use `Edit` to create new tracker entries. |
 | Canva MCP | Optional visual CV workflow when `canva_resume_design_id` exists |
-| Bash / Node | `generate-pdf.mjs`, `cv-sync-check.mjs`, integrity scripts, update checks |
+| Bash / Node | `scripts/generate-pdf.mjs`, `scripts/cv-sync-check.mjs`, integrity scripts, update checks |
 
 ### Time-to-opportunity priority
 

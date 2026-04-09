@@ -18,7 +18,7 @@ Read these before evaluating:
 - `config/profile.yml`
 - `modes/_profile.md`
 - `templates/cv-template.html`
-- `generate-pdf.mjs`
+- `scripts/generate-pdf.mjs`
 
 Never write to `cv.md`.
 Never invent facts or metrics.
@@ -114,7 +114,7 @@ Header format:
 9. Run:
 
 ```bash
-node generate-pdf.mjs /tmp/cv-candidate-{company-slug}.html output/cv-candidate-{company-slug}-{{DATE}}.pdf --format={letter|a4}
+node scripts/generate-pdf.mjs /tmp/cv-candidate-{company-slug}.html output/cv-candidate-{company-slug}-{{DATE}}.pdf --format={letter|a4}
 ```
 
 ### Step 6 -- Write the tracker TSV line

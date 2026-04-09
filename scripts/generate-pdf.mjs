@@ -4,7 +4,7 @@
  * generate-pdf.mjs - HTML -> PDF via Playwright
  *
  * Usage:
- *   node generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4]
+ *   node scripts/generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4]
  *
  * Requires: playwright installed.
  * Uses Chromium headless to render the HTML and produce a clean, ATS-parseable PDF.
@@ -16,6 +16,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const projectRoot = fileURLToPath(new URL('..', import.meta.url));
 
 /**
  * Normalize text for ATS compatibility by converting problematic Unicode.
@@ -105,7 +106,7 @@ export function isSafeRenderUrl(url) {
 
 export async function generatePDF({ inputPath, outputPath, format = 'a4', silent = false } = {}) {
   if (!inputPath || !outputPath) {
-    throw new Error('Usage: node generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4]');
+    throw new Error('Usage: node scripts/generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4]');
   }
 
   const log = silent ? () => {} : console.log;
@@ -124,7 +125,7 @@ export async function generatePDF({ inputPath, outputPath, format = 'a4', silent
 
   let html = await readFile(inputPath, 'utf-8');
 
-  const fontsDir = resolve(__dirname, 'fonts');
+  const fontsDir = resolve(projectRoot, 'fonts');
   html = html.replace(/url\(['"]?\.\/fonts\//g, `url('file://${fontsDir}/`);
   html = html.replace(/file:\/\/([^'")]+)\.woff2['"]\)/g, `file://$1.woff2')`);
 

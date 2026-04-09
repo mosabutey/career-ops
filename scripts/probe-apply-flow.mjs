@@ -11,7 +11,7 @@
  * - stop at account creation, sign-in, or inaccessible handoff boundaries
  *
  * Usage:
- *   node probe-apply-flow.mjs --platform=workday --url="https://..." --slug=my-run
+ *   node scripts/probe-apply-flow.mjs --platform=workday --url="https://..." --slug=my-run
  */
 
 import { chromium } from 'playwright';
@@ -19,7 +19,7 @@ import { mkdirSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const ROOT = dirname(fileURLToPath(import.meta.url));
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const ARTIFACT_DIR = join(ROOT, 'output', 'live-tests');
 
 const STEP_PATTERNS = [
@@ -299,7 +299,7 @@ async function run() {
   const slug = slugify(args.slug || `${platform}-${new Date().toISOString().slice(0, 10)}`);
 
   if (!platform || !url) {
-    console.error('Usage: node probe-apply-flow.mjs --platform=workday --url="https://..." --slug=my-run');
+    console.error('Usage: node scripts/probe-apply-flow.mjs --platform=workday --url="https://..." --slug=my-run');
     process.exit(1);
   }
 

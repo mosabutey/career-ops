@@ -23,7 +23,7 @@
 11. Inject keywords naturally into existing achievements without inventing anything
 12. Generate full HTML from the template and tailored content
 13. Write HTML to a temporary file
-14. Run `node generate-pdf.mjs`
+14. Run `node scripts/generate-pdf.mjs`
 15. Report PDF path, page count, and keyword coverage
 
 ## Document-family guidance

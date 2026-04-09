@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 
-const ROOT = dirname(fileURLToPath(import.meta.url));
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const ARTIFACT_DIR = join(ROOT, 'output', 'live-tests');
 
 function parseArgs(argv) {
@@ -1372,7 +1372,7 @@ async function run() {
   const forceConsent = args['force-consent'] === 'true';
 
   if (!email || !password || !url) {
-    console.error('Usage: WORKDAY_TEST_EMAIL=... WORKDAY_TEST_PASSWORD=... node probe-workday-fill-myinfo.mjs --url="https://..." --slug=my-run');
+    console.error('Usage: WORKDAY_TEST_EMAIL=... WORKDAY_TEST_PASSWORD=... node scripts/probe-workday-fill-myinfo.mjs --url="https://..." --slug=my-run');
     process.exit(1);
   }
 

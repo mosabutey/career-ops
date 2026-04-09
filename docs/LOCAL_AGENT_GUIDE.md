@@ -11,9 +11,9 @@ With the repo open locally, the agent can:
 - personalize `config/profile.yml`, `modes/_profile.md`, `cv.md`, `article-digest.md`, and `portals.yml`
 - run local Node scripts such as:
   - `npm run doctor`
-  - `node verify-pipeline.mjs`
-  - `node merge-tracker.mjs`
-  - `node analyze-patterns.mjs`
+  - `node scripts/verify-pipeline.mjs`
+  - `node scripts/merge-tracker.mjs`
+  - `node scripts/analyze-patterns.mjs`
 - open job sites and evaluate live postings when browser automation is available
 - generate ATS-safe resumes, CVs, and cover letters
 - inspect job application forms and generate tailored responses
@@ -84,7 +84,7 @@ Best-practice order for review access:
 2. persistent session recovery
 3. ATS saved-draft or returning-applicant recovery
 
-For Phenom / Phenom People employers, the repo now includes `assist-phenom-review-handoff.mjs`, which uses a persistent local browser profile and leaves the live browser open by default so the candidate can inspect the real review page directly.
+For Phenom / Phenom People employers, the repo now includes `scripts/assist-phenom-review-handoff.mjs`, which uses a persistent local browser profile and leaves the live browser open by default so the candidate can inspect the real review page directly.
 
 For platform-specific browser guidance, see [docs/ATS_APPLY_PLAYBOOK.md](ATS_APPLY_PLAYBOOK.md).
 For handoff and recovery guidance, see [docs/APPLY_REVIEW_HANDOFF.md](APPLY_REVIEW_HANDOFF.md).

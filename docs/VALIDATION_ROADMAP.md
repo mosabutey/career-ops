@@ -22,7 +22,7 @@ Use this roadmap with:
 - Repo guidance, data contract, and human-review boundaries are clear and durable.
 - English-first role-pack x career-stage reasoning is well represented in the modes.
 - Apply-mode documentation is grounded in real ATS observations rather than pure speculation.
-- PDF generation now has an end-to-end smoke test in `test-all.mjs`.
+- PDF generation now has an end-to-end smoke test in `scripts/test-all.mjs`.
 
 ### Partially proven
 
@@ -161,7 +161,7 @@ The repo now has a smoke test for the PDF path. The next step is output quality 
 Done means:
 - known-good fixtures exist for at least short, standard, and stress cases
 - any overflow or layout failures are fixed in `templates/cv-template.html`
-- `test-all.mjs` stays fast while focused PDF edge cases can be run intentionally
+- `scripts/test-all.mjs` stays fast while focused PDF edge cases can be run intentionally
 
 ---
 
@@ -199,7 +199,7 @@ Update targets:
 - `docs/ATS_APPLY_PLAYBOOK.md` for platform-specific strategy
 - `docs/BROWSER_APPLY_CHECKLIST.md` for execution checklist changes
 - `docs/LIVE_APPLY_VALIDATION_NOTES.md` for evidence and confidence updates
-- `test-all.mjs` only when the new behavior is deterministic enough to validate automatically
+- `scripts/test-all.mjs` only when the new behavior is deterministic enough to validate automatically
 
 Done means:
 - no strong repo claim remains unsupported by either live notes or a deterministic test
