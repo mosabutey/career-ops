@@ -1,0 +1,26 @@
+application_defaults:
+  greenhouse_defaults:
+    desired_compensation: "Open to discussing compensation based on role scope, territory, and total package."
+
+  # Application-specific overrides can be kept local-only and keyed by
+  # the helper application slug with hyphens converted to underscores.
+  greenhouse_personalis_junior:
+    location_city: "Example City, State, United States"
+    school: "Example University"
+    degree: "Doctor of Philosophy (Ph.D.)"
+    discipline: "Biology"
+    start_date: "January 2027"
+    source_label: "Employer Careers Website"
+
+  greenhouse_personalis_senior:
+    location_city: "Example City, State, United States"
+    school: "Example University"
+    degree: "Doctor of Philosophy (Ph.D.)"
+    discipline: "Biology"
+    start_date: "January 2027"
+    source_label: "Employer Careers Website"
+
+  greenhouse_legend:
+    current_employer: "Example Research University"
+    current_title: "Doctoral Researcher"
+    desired_salary: "Open to discussing compensation based on role scope, territory expectations, and total package."

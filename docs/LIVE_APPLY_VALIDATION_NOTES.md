@@ -27,6 +27,7 @@ This document records hands-on validation findings from real public application 
 | 2026-04-09 | iCIMS | Medpace -- Clinical Safety Manager - Pharmacovigilance / Drug Safety | login gate | `Apply` left the social-distribution posting and opened an employer `icims.com` login route instead of an inspectable application form | `medpace-icims-clinical-safety-manager-2026-04-08.json`, `medpace-icims-clinical-safety-manager-2026-04-08-initial.png`, `medpace-icims-clinical-safety-manager-2026-04-08-after-cta.png` |
 | 2026-04-09 | Workable | CLAS -- Medical Interpreter | live form after cookie handling | cookie banner blocked the CTA until dismissed; then `Apply for this job` opened `/apply/` with large questionnaire, uploads, textareas, radios, and one combobox | `clas-workable-medical-interpreter-2026-04-08.json`, `clas-workable-medical-interpreter-2026-04-08-initial.png`, `clas-workable-medical-interpreter-2026-04-08-after-cta.png` |
 | 2026-04-09 | Phenom | Eisai -- MSL/Sr. MSL, Neurology - Alzheimer's Disease, New England | review reached without submission | a truthful fill pass uploaded the tailored resume, advanced through personal information, work and education, job-specific questions, veteran disclosure, disability self-ID, and reached a real `Review` page with a visible `Submit` button | `eisai-r3995-apply-2026-04-09.json`, `eisai-review-2026-04-09.json`, `eisai-review-2026-04-09.png` |
+| 2026-04-09 | Greenhouse | live oncology MSL employer | submit-confirm-track loop proven | the live final submit triggered a security-code email, the newest code completed the still-open session, the browser advanced to a true `Thank you for applying` page, and a separate employer confirmation email arrived afterward | local private apply artifacts |
 
 ## Validated platforms
 
@@ -47,6 +48,12 @@ Observed:
 - A live checkbox acknowledgment was successfully marked on the Cytokinetics form
 - A current Azurity medical-affairs form exposed 2 visible file inputs and 16 visible comboboxes in one live pass
 - The workflow stopped before submission
+- A live oncology-MSL Greenhouse submit attempt later proved that Greenhouse can branch into a post-submit security-code loop instead of finishing immediately
+- Entering the newest inbox-delivered security code into the same live Greenhouse session advanced the application to a true `Thank you for applying` page
+- A separate employer confirmation email arrived after browser success, giving a second durable confirmation signal
+- Two same-company Greenhouse submissions later proved that security-code emails can arrive with the same sender and subject but without role-specific identification
+- When those same-company Greenhouse codes were mapped to the wrong live windows, both sessions stayed recoverable and surfaced `Incorrect security code`, allowing the correct code-to-window swap without restarting the applications
+- After swapping the codes inside the original role-specific live sessions, both windows advanced to true `Thank you for applying` pages and a shared employer confirmation email arrived afterward
 
 Important finding:
 - Greenhouse may expose both `First Name` and `Preferred First Name`, so exact selectors are safer than broad label matching
@@ -55,6 +62,10 @@ Important finding:
 - Not every combobox variant behaved the same way across pages, so value verification after selection is important
 - A stale Greenhouse role URL can redirect to the jobs index with `?error=true`; the resulting page may still show interactive filters and job links, so agents should not mistake it for a valid application form
 - At least one stale Greenhouse redirect surfaced React hydration warnings while still rendering the jobs index, so console noise alone should not be treated as proof of an active form
+- Greenhouse may emit multiple security-code emails for the same application attempt, so the newest matching code should be used
+- Greenhouse post-submit handling should not move tracker state to `Applied` until the security-code loop ends in a true success page or a confirmation email
+- Same-company Greenhouse submissions can produce ambiguous verification emails that do not identify the role, so one-at-a-time final submit is safer than parallel same-company final submit
+- If the wrong Greenhouse code is entered, the live browser session can still remain recoverable, so the right recovery move is to keep the session open, read the explicit on-page error, and retry with corrected mapping
 
 ### Lever
 
@@ -247,11 +258,15 @@ Important finding:
 - Workday sign-in probing should target modal fields carefully when sign-in overlays the create-account page, because duplicate visible inputs can coexist on the same DOM
 - Workday step-1 filling should map repo/profile data into both plain fields and custom picker controls rather than assuming a uniform form model
 - Greenhouse stale redirects should be classified before control counting so index filters are not mistaken for form questions
+- Greenhouse support should treat post-submit verification-code loops as a first-class branch, not as a failed submission
+- Greenhouse support should prefer serialized same-company final submits to avoid ambiguous code-to-role mapping
 - SmartRecruiters support should look for alternate CTA text such as `I'm interested` and verify whether the application handoff actually renders usable controls or an explicit access restriction
 - Ashby support can treat same-tab application pages as a realistic high-value target for assisted form filling
 - iCIMS support should treat employer-hosted `/login` handoffs as a documented boundary rather than as an unexplained failure
 - Workable support should handle cookie banners before deciding whether the CTA is absent
 - Browser-assisted application support is viable, but must keep the user-review boundary intact
+- Tracker status should move from `Evaluated` to `Applied` only after a real browser success signal or inbox confirmation exists
+- Low-disk fallback paths matter in live apply work; preserving the live session is more important than forcing heavyweight artifacts
 
 ## Current confidence by control type
 
@@ -261,6 +276,8 @@ High confidence:
 - stale-link detection
 - Greenhouse custom-combobox handling in at least one live sponsorship flow
 - Greenhouse live-form detection on at least one current high-combobox medical-affairs page
+- Greenhouse verification-code handling and submit confirmation on at least one live oncology MSL flow
+- Greenhouse recovery after incorrect code entry in same-company concurrent submissions
 - checkbox interaction
 - Workday launcher detection
 - Workday multi-step flow detection up to the create-account gate
@@ -296,7 +313,7 @@ Not yet proven in live testing:
 - a reliable generalized selector strategy for Workday disclosure/self-ID dropdown options across employers
 - reliable SmartRecruiters progression past one-click restrictions
 - deeper iCIMS progression past the employer login handoff
-- final-submit handling, by design
+- final-submit handling across platforms beyond the Greenhouse verification-code pattern
 
 ## Workday boundary note
 

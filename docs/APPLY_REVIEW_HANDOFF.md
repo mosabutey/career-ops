@@ -106,6 +106,7 @@ Practical caution:
 - session persistence is useful but not guaranteed
 - some ATS platforms expire server-side state even when the browser profile survives
 - treat session recovery as a strong fallback, not a promise
+- if reopening a saved browser profile lands on a blank page or a stale shell, prefer rerunning the ATS-specific handoff helper against the live application URL with the same approved document paths instead of trusting the restored tab state blindly
 
 ## Fallback mode 2: ATS saved draft or returning-applicant recovery
 
@@ -165,6 +166,72 @@ Even when a visible handoff is available, capture:
 - any unresolved required fields
 
 These artifacts make both recovery paths much more practical.
+
+## Post-submit confirmation loop
+
+When the candidate clicks the final ATS `Submit` button, the work is not done yet.
+
+Use this confirmation order:
+
+1. Browser outcome
+2. Inbox outcome
+3. Tracker update
+
+Session continuity rule:
+- prefer working inside the exact live ATS window the candidate just used
+- after the candidate clicks `Submit`, inspect that same window before opening anything else
+- if the ATS asks for a code, enter it into that same in-progress session and resubmit there
+- do not abandon a live post-submit session just because a related email arrived
+- use session reopening only as a fallback when the live window is gone
+
+Low-disk rule:
+- if the machine is tight on disk, prefer a low-artifact relaunch rather than a screenshot-heavy handoff run
+- for the Greenhouse helper, `--skip-screenshot=true` is the right fallback when the browser session itself matters more than a full-page artifact
+- if artifact writes start failing with no-space errors, preserve the newest validated session and remove only disposable older handoff artifacts before retrying
+
+What to verify in the browser:
+- true success page such as `Thank you for applying`
+- duplicate-submission notice
+- inline verification-code prompt
+- inline validation or server error
+
+What to verify in the inbox:
+- employer confirmation mail
+- ATS-generated verification code
+- duplicate or already-applied message
+
+Tracker rule:
+- keep the application at `Evaluated` until there is a real success signal
+- mark `Applied` only after a true browser success page or a confirmation email
+- if the candidate only reaches a verification-code prompt, do not mark `Applied` yet
+
+## Greenhouse verified loop
+
+This repo has now validated a real Greenhouse post-submit loop on a live employer submission.
+
+Observed sequence:
+- the candidate clicked final submit on the live Greenhouse form
+- Greenhouse requested a security code instead of completing the submission immediately
+- the latest code arrived by email from the Greenhouse mail sender
+- entering the newest code into the still-open Greenhouse session and resubmitting advanced to a true `Thank you for applying` page
+- a separate employer confirmation mail then arrived afterward
+
+Operational guidance:
+- always use the newest verification code, not an older one from the same thread or inbox search
+- keep the live browser window open while handling the code loop so the same in-progress application can be resumed and completed in place
+- confirm both the browser success page and the employer confirmation email when available
+- only after one of those success signals should the tracker move to `Applied`
+
+Concurrency rule:
+- if two Greenhouse applications from the same company are waiting on final submit, do not submit them simultaneously unless there is a good reason
+- prefer one-at-a-time final submit, verification, browser confirmation, inbox confirmation, and tracker update
+- same-company Greenhouse security-code emails may share the same sender and subject and may not name the exact role, which makes code-to-window mapping ambiguous
+- if simultaneous submits already happened, keep both role-specific browser windows open, use their exact titles to distinguish them, and be ready to test or swap code mapping without losing session state
+
+Important boundary:
+- this loop is ATS-specific and employer-specific
+- Greenhouse has now been proven to support a verification-code fork before final success
+- other platforms may instead show direct success, duplicate notices, account-bound resumes, or different inbox confirmations, so post-submit handling should stay platform-aware
 
 ## Bottom line
 

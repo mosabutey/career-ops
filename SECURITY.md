@@ -39,6 +39,8 @@ Never commit:
 
 If a file contains real identity, contact, compensation, authorization, disclosure, account, or application data, it belongs in the local user layer only.
 
+Portal and ATS learnings are encouraged in the public repo when they are sanitized and reusable. Keep the generic lesson public, and keep employer-specific or user-specific operator details in `.career-ops-local/`. See [docs/PUBLIC_PORTAL_LEARNINGS.md](docs/PUBLIC_PORTAL_LEARNINGS.md).
+
 ## Browser Automation Boundaries
 
 Agents should not:
@@ -75,6 +77,7 @@ Before pushing changes, check:
 3. no local absolute paths leaked into shared system files
 4. no live-test screenshots or reports with PII are being committed
 5. public docs and examples use placeholders or intentionally public sample data only
+6. `npm run privacy-check` passes before public push
 
 ## Reporting a Security Issue
 

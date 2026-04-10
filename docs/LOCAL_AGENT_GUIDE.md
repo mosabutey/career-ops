@@ -23,6 +23,12 @@ With the repo open locally, the agent can:
 
 For repeatable browser-assisted apply work, prefer keeping those upload paths in the local-only `application_files` section of `config/profile.yml` instead of pasting them ad hoc during a live portal session.
 
+For operator-grade local apply work, also keep a separate ignored knowledge layer under `.career-ops-local/` for things that should improve your local performance but should not be pushed to the public repo. Good examples:
+- employer-specific ATS quirks from real submit loops
+- accepted-value overrides for fragile dropdowns or comboboxes
+- local recovery notes for browser-session or verification-code handling
+- private publish-time notes about what must be generalized before a public push
+
 ## Portal-ready local profile
 
 If you want `/career-ops apply` to run with minimal interruptions, your local-only `config/profile.yml` should include more than high-level career strategy.
@@ -39,6 +45,8 @@ Before live apply sessions, keep these truthfully filled in:
 - whether the agent may pre-check required consent/attestation boxes before your review
 
 This information belongs in the local user layer only. It should stay in `config/profile.yml`, not in public repo docs or shared system files.
+
+When a lesson is broadly reusable, promote only the generic version into the system layer. Keep the sharp, employer-specific, user-specific, or locally sensitive version in `.career-ops-local/`.
 
 ## What the local agent should not do
 

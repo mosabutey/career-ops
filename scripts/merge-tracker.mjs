@@ -221,7 +221,7 @@ for (const file of tsvFiles) {
     duplicate = existingApps.find(app => app.num === addition.num);
   }
 
-  if (!duplicate) {
+  if (!duplicate && !reportNum) {
     const normalizedCompany = normalizeCompany(addition.company);
     duplicate = existingApps.find(app => {
       if (normalizeCompany(app.company) !== normalizedCompany) return false;

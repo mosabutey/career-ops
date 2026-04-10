@@ -11,7 +11,9 @@ batch/logs/*
 batch/batch-state.tsv
 batch/batch-input.tsv
 batch/tracker-additions/*.tsv
+batch/tracker-additions/merged/*.tsv
 !batch/tracker-additions/.gitkeep
+!batch/tracker-additions/merged/.gitkeep
 jds/*
 !jds/.gitkeep
 
@@ -27,6 +29,7 @@ interview-prep/*.md
 .update-lock
 .env
 .env.*
+.career-ops-local/
 playwright/.auth/
 storage-state*.json
 *.har

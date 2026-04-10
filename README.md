@@ -146,7 +146,9 @@ For `/career-ops apply`, do not stop at a minimal profile. Fill the local-only `
 Privacy note:
 - `cv.md`, `config/profile.yml`, `modes/_profile.md`, `article-digest.md`, and interview-prep notes are intended to stay local on your machine and should not be committed to the open-source repo.
 - The repo is designed so agents can use those files locally while keeping the public system layer generic.
+- For private operator knowledge that improves local apply performance without belonging in the public system layer, use an ignored `.career-ops-local/` folder.
 - See [SECURITY.md](SECURITY.md) for the privacy and security model, including ignored secret/session artifacts and local-only browser-validation outputs.
+- For guidance on which portal learnings should be published versus kept local, see [docs/PUBLIC_PORTAL_LEARNINGS.md](docs/PUBLIC_PORTAL_LEARNINGS.md).
 
 ## Typical Workflows
 

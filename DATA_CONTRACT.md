@@ -26,8 +26,17 @@ They should also remain local-only in normal use. Do not commit them to the publ
 Operational secrets and browser/session artifacts are also local-only even if they are not part of the normal content model. Examples:
 
 - `.env` and `.env.*`
+- `.career-ops-local/*`
 - browser auth/session exports such as `playwright/.auth/*` or `storage-state*.json`
 - local network captures such as `*.har`
+
+Private operating knowledge should also stay local-only. Examples:
+
+- employer-specific ATS quirks learned from live applications
+- accepted-value overrides for brittle portal fields
+- post-submit recovery notes
+- window-to-code mapping notes during verification loops
+- publish-time sanitization notes that would weaken the public repo if forced into generic docs
 
 ## System Layer (safe to auto-update)
 

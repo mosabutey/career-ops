@@ -51,6 +51,7 @@ If the candidate asks for it and browser control is available, the agent may:
 5. If there is no match -> say so and offer a quick auto-pipeline evaluation
 6. Read `config/profile.yml` for `authorization` details before answering work authorization or sponsorship questions
 7. If `authorization.candidate_profile_type` exists, use it to map the candidate to the right sponsorship-answer pattern before filling any ATS yes/no field
+8. If `.career-ops-local/apply-private-notes.md` or `.career-ops-local/platform-overrides.yml` exists, use them as the private operator layer for employer-specific apply learnings that should not be promoted into public docs
 
 ## Step 3 -- Detect role changes
 
@@ -161,6 +162,16 @@ For uploads and form-filling:
 - stop before the final submit or send action so the candidate can review everything
 - when review is reached in a visible browser session, prefer leaving that live page open rather than closing the browser and relying only on screenshots
 - if a visible review handoff is not possible, save the last URL, active step, uploads used, and unresolved fields so the candidate can recover through a persistent session or the ATS's own saved-draft flow later
+- if reopening a saved browser profile produces a blank page or a stale shell, prefer rerunning the ATS-specific review-handoff helper against the live application URL with the same approved files instead of assuming the restored tab is trustworthy
+- after the candidate clicks final `Submit`, inspect the immediate browser response before changing tracker state
+- prefer staying in the exact live browser session the candidate used for submit; only fall back to reopening or reconstruction if that live window is gone
+- if the post-submit page asks for a verification or security code and Gmail is connected, search the inbox for the newest matching code and help complete the same live session
+- on Greenhouse specifically, a final submit can branch into a security-code loop; do not count the application as submitted until that loop ends in a true success page or a confirmation email
+- if multiple Greenhouse roles from the same company are pending final submit, prefer submitting them one at a time because the security-code emails may be indistinguishable at the role level
+- if same-company Greenhouse submits were already triggered in parallel, preserve every live role-specific window and use window title + on-page state to keep the code mapping straight
+- if the browser lands on `Thank you for applying`, a duplicate notice, or another explicit post-submit state, report that exact state back to the candidate instead of paraphrasing it as generic success or failure
+- when Gmail is available, use inbox evidence as the durable confirmation record for submit, verification-code handling, and later recruiter follow-up checks
+- if artifact capture starts failing because of disk pressure, rerun the live handoff helper in low-artifact mode rather than abandoning the browser-assisted apply flow
 
 **Output format:**
 
@@ -190,9 +201,12 @@ Notes:
 ## Step 6 -- Post-apply (optional)
 
 If the candidate confirms that the application was submitted:
-1. Update the status in `applications.md` from `Evaluated` to `Applied`
-2. Update Section H in the report with the final answers
-3. Suggest the next step: `/career-ops contact` for LinkedIn outreach
+1. Check the live browser result first and record whether it showed a success page, duplicate notice, verification-code prompt, or error
+2. If the page requests a verification code and Gmail is connected, pull the newest matching email and help complete the loop before making any tracker change
+3. Search the inbox for the matching confirmation email when browser success is claimed or visible
+4. Update the status in `applications.md` from `Evaluated` to `Applied` only after a real success page or confirmation email exists
+5. Update Section H in the report with the final answers if needed
+6. Suggest the next step: `/career-ops contact` for LinkedIn outreach
 
 ## Safety boundary
 

@@ -9,6 +9,7 @@
     "dedup": "node scripts/dedup-tracker.mjs",
     "merge": "node scripts/merge-tracker.mjs",
     "patterns": "node scripts/analyze-patterns.mjs",
+    "privacy-check": "node scripts/privacy-check.mjs",
     "pdf": "node scripts/generate-pdf.mjs",
     "probe:apply": "node scripts/probe-apply-flow.mjs",
     "apply:phenom-review": "node scripts/assist-phenom-review-handoff.mjs",
